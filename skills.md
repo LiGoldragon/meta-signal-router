@@ -1,4 +1,4 @@
-# skills — owner-signal-router
+# skills — meta-signal-router
 
 Before editing, read:
 
@@ -13,7 +13,7 @@ Before editing, read:
 - `../router/ARCHITECTURE.md`
 - `../signal-persona-mind/ARCHITECTURE.md`
 
-This repo owns only the owner-only PersonaRouter channel-policy
+This repo owns only the meta-signal PersonaRouter channel-policy
 signal vocabulary. It contains no daemon, no database tables, no
 actor runtime, no CLI parser, and no policy evaluation logic.
 The caller is PersonaOrchestrate; do not document or implement Mind as

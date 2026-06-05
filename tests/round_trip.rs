@@ -1,11 +1,11 @@
-use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
-use owner_signal_router::{
+use meta_signal_router::{
     AdjudicationDenial, AdjudicationDenied, AdjudicationRequestIdentifier, ChannelDuration,
     ChannelEndpoint, ChannelExtended, ChannelExtension, ChannelGrant, ChannelGranted,
     ChannelMessageKind, ChannelOrderRejected, ChannelOrderRejectionReason, ChannelRevocation,
-    ChannelRevoked, Frame, FrameBody, Operation, OperationKind, OwnerRouterReply, Request,
+    ChannelRevoked, Frame, FrameBody, MetaRouterReply, Operation, OperationKind, Request,
     RequestUnimplemented, TextBody, TimestampNanoseconds, UnimplementedReason,
 };
+use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
 use signal_frame::{
     ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply, RequestPayload, SessionEpoch,
     SubReply,
@@ -61,7 +61,7 @@ fn round_trip_request(request: Operation) -> Operation {
     }
 }
 
-fn round_trip_reply(reply: OwnerRouterReply) -> OwnerRouterReply {
+fn round_trip_reply(reply: MetaRouterReply) -> MetaRouterReply {
     let frame = Frame::new(FrameBody::Reply {
         exchange: exchange(),
         reply: Reply::committed(NonEmpty::single(SubReply::Ok(reply))),
@@ -95,7 +95,7 @@ where
 }
 
 #[test]
-fn owner_router_requests_round_trip() {
+fn meta_router_requests_round_trip() {
     let requests = vec![
         Operation::Grant(grant()),
         Operation::Extend(ChannelExtension {
@@ -120,19 +120,19 @@ fn owner_router_requests_round_trip() {
 }
 
 #[test]
-fn owner_router_replies_round_trip() {
+fn meta_router_replies_round_trip() {
     let replies = vec![
-        OwnerRouterReply::ChannelGranted(ChannelGranted { channel: channel() }),
-        OwnerRouterReply::ChannelExtended(ChannelExtended { channel: channel() }),
-        OwnerRouterReply::ChannelRevoked(ChannelRevoked { channel: channel() }),
-        OwnerRouterReply::AdjudicationDenied(AdjudicationDenied {
+        MetaRouterReply::ChannelGranted(ChannelGranted { channel: channel() }),
+        MetaRouterReply::ChannelExtended(ChannelExtended { channel: channel() }),
+        MetaRouterReply::ChannelRevoked(ChannelRevoked { channel: channel() }),
+        MetaRouterReply::AdjudicationDenied(AdjudicationDenied {
             request: adjudication_request(),
         }),
-        OwnerRouterReply::ChannelOrderRejected(ChannelOrderRejected {
+        MetaRouterReply::ChannelOrderRejected(ChannelOrderRejected {
             operation: OperationKind::Grant,
             reason: ChannelOrderRejectionReason::PolicyRefused,
         }),
-        OwnerRouterReply::RequestUnimplemented(RequestUnimplemented {
+        MetaRouterReply::RequestUnimplemented(RequestUnimplemented {
             operation: OperationKind::Grant,
             reason: UnimplementedReason::NotBuiltYet,
         }),
@@ -144,7 +144,7 @@ fn owner_router_replies_round_trip() {
 }
 
 #[test]
-fn owner_router_operations_encode_as_contract_local_nota_heads() {
+fn meta_router_operations_encode_as_contract_local_nota_heads() {
     let operation = Operation::Grant(grant());
     let mut encoder = Encoder::new();
     operation
@@ -167,7 +167,7 @@ fn owner_router_operations_encode_as_contract_local_nota_heads() {
 }
 
 #[test]
-fn owner_router_request_exposes_contract_owned_operation_kind() {
+fn meta_router_request_exposes_contract_owned_operation_kind() {
     let cases = vec![
         (Operation::Grant(grant()), OperationKind::Grant),
         (
@@ -199,7 +199,7 @@ fn owner_router_request_exposes_contract_owned_operation_kind() {
 }
 
 #[test]
-fn owner_order_names_are_not_channel_message_kinds() {
+fn meta_order_names_are_not_channel_message_kinds() {
     for kind in ChannelMessageKind::ALL {
         let mut encoder = Encoder::new();
         kind.encode(&mut encoder).expect("encode");

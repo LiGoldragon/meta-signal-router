@@ -1,7 +1,7 @@
-//! OwnerSignal contract for privileged PersonaRouter channel policy.
+//! MetaSignal contract for privileged PersonaRouter channel policy.
 //!
 //! Ordinary router observation traffic lives in `signal-router`.
-//! This crate carries Orchestrate-to-Router owner-only channel
+//! This crate carries Orchestrate-to-Router meta-signal channel
 //! authority orders. Mind-level decisions reach Router through
 //! Orchestrate, not by calling this contract directly.
 
@@ -257,7 +257,7 @@ pub struct ChannelOrderRejected {
     Archive, RkyvSerialize, RkyvDeserialize, NotaEnum, Debug, Clone, Copy, PartialEq, Eq, Hash,
 )]
 pub enum ChannelOrderRejectionReason {
-    OwnerAuthorityRequired,
+    MetaAuthorityRequired,
     ChannelAlreadyExists,
     ChannelMissing,
     AdjudicationRequestMissing,
@@ -280,13 +280,13 @@ pub struct RequestUnimplemented {
 }
 
 signal_channel! {
-    channel OwnerRouter {
+    channel MetaRouter {
         operation Grant(ChannelGrant),
         operation Extend(ChannelExtension),
         operation Revoke(ChannelRevocation),
         operation Deny(AdjudicationDenial),
     }
-    reply OwnerRouterReply {
+    reply MetaRouterReply {
         ChannelGranted(ChannelGranted),
         ChannelExtended(ChannelExtended),
         ChannelRevoked(ChannelRevoked),

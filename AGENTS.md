@@ -1,4 +1,4 @@
-# owner-signal-router
+# meta-signal-router
 
 Read `~/primary/AGENTS.md`, then this repository's `skills.md`.
 

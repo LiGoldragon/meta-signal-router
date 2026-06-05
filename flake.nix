@@ -1,5 +1,5 @@
 {
-  description = "owner-signal-router - OwnerSignal contract for PersonaRouter channel policy";
+  description = "meta-signal-router - MetaSignal contract for PersonaRouter channel policy";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -71,7 +71,7 @@
           );
         };
         devShells.default = pkgs.mkShell {
-          name = "owner-signal-router";
+          name = "meta-signal-router";
           packages = [
             pkgs.jujutsu
             pkgs.pkg-config

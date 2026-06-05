@@ -1,6 +1,6 @@
-# owner-signal-router
+# meta-signal-router
 
-Owner-only Signal contract for PersonaRouter channel policy orders.
+Meta-signal Signal contract for PersonaRouter channel policy orders.
 
 Ordinary router observation traffic lives in `signal-router`.
 Runtime behavior lives in `router`.

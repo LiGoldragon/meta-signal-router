@@ -1,30 +1,30 @@
-# INTENT — owner-signal-router
+# INTENT — meta-signal-router
 
-*The owner-only wire contract for PersonaRouter channel policy. Defines the typed
+*The meta-signal wire contract for PersonaRouter channel policy. Defines the typed
 request/reply channel that `persona-orchestrate` uses to grant, extend, revoke,
 or deny channel authority in the router.
 Companion to `ARCHITECTURE.md` and `Cargo.toml`. Maintenance: `primary/skills/repo-intent.md`.*
 
 ## Repo-scope only
 
-This file carries only the intent that is FOR this owner-only `owner-signal-router`
+This file carries only the intent that is FOR this meta-signal `meta-signal-router`
 contract. Workspace-shape intent stays in the primary workspace `primary/INTENT.md`.
 Component daemon intent stays in `router/INTENT.md`. Ordinary router observation
 traffic stays in `signal-router/INTENT.md`.
 
 ## Why this repo exists
 
-`owner-signal-router` is the **owner-only policy signal** for PersonaRouter
+`meta-signal-router` is the **meta-signal policy signal** for PersonaRouter
 channel authority. The caller is `persona-orchestrate`, because Orchestrate owns
 Router in the authority graph: Mind decides whether channel policy should change,
-orders Orchestrate through `owner-signal-persona-orchestrate`, and Orchestrate
+orders Orchestrate through `meta-signal-orchestrate`, and Orchestrate
 enacts that decision here. Ordinary router observation traffic stays in
 `signal-router`; runtime actors, policy evaluation, socket binding, durable grant
 tables, and command lowering live in `router`.
 
 ## The channel shape
 
-The owner channel carries a deliberately small surface:
+The meta channel carries a deliberately small surface:
 
 - **Requests:** `Grant(ChannelGrant)` (create or replace a live channel grant),
   `Extend(ChannelExtension)` (change a grant's duration),
@@ -37,13 +37,13 @@ The owner channel carries a deliberately small surface:
 Policy types: `ChannelEndpoint` names internal component endpoints and external
 connection classes (using `signal-persona-origin` vocabulary); `ChannelMessageKind`
 names route categories a grant can cover; `ChannelDuration` is the requested
-lifetime (one-shot, permanent, or time-bound). Owner-order names (grant,
+lifetime (one-shot, permanent, or time-bound). Meta-order names (grant,
 extension, revocation, denial) are intentionally absent from `ChannelMessageKind`
 — those are operations on this contract, not message categories being routed.
 
 ## Constraints
 
-- Channel-authority orders live only in the owner contract; ordinary observation
+- Channel-authority orders live only in the meta-signal contract; ordinary observation
   stays in `signal-router`.
 - The wire carries contract-local operation roots only — there is no public
   `Mutate` or `Retract` wrapper. The Sema class is a daemon-side projection.

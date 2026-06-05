@@ -1,17 +1,17 @@
-# owner-signal-router — architecture
+# meta-signal-router — architecture
 
-*Owner-only Signal contract for PersonaRouter channel policy.*
+*Meta-signal Signal contract for PersonaRouter channel policy.*
 
 ---
 
 ## 0 · TL;DR
 
-`owner-signal-router` is the policy signal for
-PersonaRouter channel authority. It carries owner-only orders that
+`meta-signal-router` is the policy signal for
+PersonaRouter channel authority. It carries meta-signal orders that
 grant, extend, revoke, or deny channel authority in the router.
 The caller is PersonaOrchestrate, because Orchestrate owns Router in
 the authority graph. Mind decides whether channel policy should
-change, then orders Orchestrate through `owner-signal-persona-orchestrate`;
+change, then orders Orchestrate through `meta-signal-orchestrate`;
 Orchestrate enacts that decision here.
 
 Ordinary router observation traffic stays in `signal-router`.
@@ -32,13 +32,13 @@ The initial surface is deliberately small:
 
 | Side | Component |
 |---|---|
-| Request producer | `persona-orchestrate` owner-signal actor. |
-| Request consumer | `router` owner-signal actor. |
-| Decision source upstream | `persona-mind`, through `owner-signal-persona-orchestrate`. |
+| Request producer | `persona-orchestrate` meta-signal actor. |
+| Request consumer | `router` meta-signal actor. |
+| Decision source upstream | `persona-mind`, through `meta-signal-orchestrate`. |
 
 | Operation | Projected Sema class | Meaning |
 |---|---|---|
-| `Grant` | `Mutate` | Apply owner authority by creating or replacing a live channel grant. |
+| `Grant` | `Mutate` | Apply meta authority by creating or replacing a live channel grant. |
 | `Extend` | `Mutate` | Change the duration of a live channel grant. |
 | `Revoke` | `Retract` | Remove a live channel grant. |
 | `Deny` | `Mutate` | Record an owner decision that an adjudication request will not receive a grant. |
@@ -62,9 +62,9 @@ contract-local operation roots only; there is no public `Mutate` or
 connection classes using `signal-persona-origin` vocabulary.
 
 `ChannelMessageKind` names route categories that can be covered by a
-grant. Owner-order names such as channel grant, extension, revocation,
+grant. Meta-order names such as channel grant, extension, revocation,
 and denial are intentionally absent from this enum; those are
-operations on this owner contract, not message categories being
+operations on this meta-signal contract, not message categories being
 routed through ordinary channels.
 
 `ChannelDuration` is the requested lifetime: one-shot, permanent, or
@@ -74,8 +74,8 @@ time-bound.
 
 This repo owns:
 
-- owner-only channel-policy operation roots and payload records;
-- owner-only replies and rejection reasons;
+- meta-signal channel-policy operation roots and payload records;
+- meta-signal replies and rejection reasons;
 - rkyv and NOTA round-trip shape for the policy signal;
 - the contract-local `OperationKind` witness emitted by
   `signal_channel!`.
@@ -95,11 +95,11 @@ This repo does not own:
 
 ## 4 · Constraints
 
-- The contract exposes owner-only router channel-policy operations,
+- The contract exposes meta-signal router channel-policy operations,
   not ordinary router observation queries.
 - The intended caller is Orchestrate, not Mind; Mind reaches Router
   channel policy by ordering Orchestrate first.
-- Grant, extension, revocation, and denial are owner operations on
+- Grant, extension, revocation, and denial are meta operations on
   this contract, not message kinds in the routed-channel vocabulary.
 - Every operation root is a contract-local verb in verb form.
 - The wire shape contains no public Sema wrapper such as `Mutate` or
@@ -117,14 +117,14 @@ This repo does not own:
 - request operations round-trip through `Frame`;
 - replies round-trip through `Frame`;
 - NOTA request heads are contract-local verbs;
-- owner-order names are absent from `ChannelMessageKind`;
+- meta-order names are absent from `ChannelMessageKind`;
 - the public operation exposes a contract-owned `OperationKind` through
   the generated `kind()` method.
 
 ## Code Map
 
 ```text
-src/lib.rs            owner router channel-policy types and signal_channel! declaration
+src/lib.rs            meta router channel-policy types and signal_channel! declaration
 tests/round_trip.rs   frame round trips and contract-local operation witnesses
 ```
 

@@ -1,15 +1,15 @@
 [package]
-name         = "owner-signal-router"
+name         = "meta-signal-router"
 version      = "0.1.0"
 edition      = "2024"
 rust-version = "1.85"
 license      = "MIT OR Apache-2.0"
-repository   = "https://github.com/LiGoldragon/owner-signal-router"
-description  = "OwnerSignal contract for privileged PersonaRouter channel-policy orders."
+repository   = "https://github.com/LiGoldragon/meta-signal-router"
+description  = "MetaSignal contract for privileged PersonaRouter channel-policy orders."
 publish      = false
 
 [lib]
-name = "owner_signal_router"
+name = "meta_signal_router"
 path = "src/lib.rs"
 
 [dependencies]
