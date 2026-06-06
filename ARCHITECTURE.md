@@ -77,8 +77,8 @@ This repo owns:
 - meta-signal channel-policy operation roots and payload records;
 - meta-signal replies and rejection reasons;
 - rkyv and NOTA round-trip shape for the policy signal;
-- the contract-local `OperationKind` witness emitted by
-  `signal_channel!`.
+- the contract-local `OperationKind` witness and the `short_header`
+  constants, emitted from `schema/lib.schema` by `schema-rust-next`.
 
 This repo does not own:
 
@@ -110,22 +110,47 @@ This repo does not own:
 - The contract crate contains no runtime actors, database handles,
   sockets, command execution, or policy evaluation logic.
 
-## 5 · Witness Tests
+## 5 · Emission
+
+This crate is a real emitting wire contract, not a hand-written
+mirror. `schema/lib.schema` is the single source of truth; `build.rs`
+runs `schema-rust-next`'s `GenerationPlan::wire_contract` driver, which
+emits the `Input`/`Output` enums, the policy payload records and reply
+types, the NOTA codec (gated behind the `nota-text` feature), and the
+`short_header` constant module into the checked-in artifact at
+`src/schema/lib.rs`. The driver's `write_or_check` step asserts those
+artifacts stay byte-identical on every ordinary build; regenerate them
+with `META_SIGNAL_ROUTER_UPDATE_SCHEMA_ARTIFACTS=1 cargo build
+--all-features` after any schema edit.
+
+The current refreshed `schema-rust-next` base emits, for a pure
+`wire_contract()` target, the wire types plus the `short_header`
+constants. The `route()` / `encode_signal_frame` convenience surface is
+gated behind a runtime-plane signal target (`emits_signal()`), so the
+raw wire form here is the rkyv archive prefixed by the contract-local
+short header; the `router` daemon wraps those bytes in the
+triad-runtime length-prefixed envelope.
+
+## 6 · Witness Tests
 
 `tests/round_trip.rs` proves:
 
-- request operations round-trip through `Frame`;
-- replies round-trip through `Frame`;
-- NOTA request heads are contract-local verbs;
-- meta-order names are absent from `ChannelMessageKind`;
-- the public operation exposes a contract-owned `OperationKind` through
-  the generated `kind()` method.
+- operations round-trip through the rkyv archive;
+- replies round-trip through the rkyv archive;
+- the `short_header` constants are contract-local and distinct;
+- operations and replies round-trip through NOTA text and carry
+  contract-local verb heads (`(Grant …)`) with no `Mutate`/`Retract`
+  wrapper;
+- meta-order names are absent from `ChannelMessageKind`.
 
 ## Code Map
 
 ```text
-src/lib.rs            meta router channel-policy types and signal_channel! declaration
-tests/round_trip.rs   frame round trips and contract-local operation witnesses
+schema/lib.schema     the meta channel-policy wire-contract schema (source of truth)
+build.rs              schema-rust-next wire_contract generation driver
+src/lib.rs            re-exports the generated schema module
+src/schema/lib.rs     checked-in generated artifact (do not hand-edit)
+tests/round_trip.rs   rkyv + NOTA round trips and contract-local witnesses
 ```
 
 ## See Also

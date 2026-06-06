@@ -1,0 +1,148 @@
+;; meta-signal-router — POLICY (meta) wire contract for the PersonaRouter
+;; channel-authority surface.
+;;
+;; Wire-only: emits the rkyv + NOTA codec and the signal-frame mail
+;; envelope (Input/Output enums, route witnesses, short headers, and
+;; encode/decode_signal_frame). No engine traits, no Nexus/SEMA content,
+;; no daemon behaviour — runtime actors, policy evaluation, socket
+;; binding, and durable grant tables live in the router daemon.
+;;
+;; This is the meta policy signal leg of the router component triad
+;; (router daemon + signal-router working signal + meta-signal-router).
+;; The caller is persona-orchestrate, because Orchestrate owns Router in
+;; the authority graph. Mind decides whether channel policy should change,
+;; orders Orchestrate through meta-signal-orchestrate, and Orchestrate
+;; enacts that decision here. Ordinary router observation traffic stays in
+;; signal-router.
+;;
+;; SELF-CONTAINED VOCABULARY. The upstream signal-persona-origin contract
+;; is not yet an emitting wire contract, so this schema defines the policy
+;; vocabulary it needs (ChannelEndpoint, ComponentName, ConnectionClass,
+;; ChannelIdentifier, ChannelDuration, ChannelMessageKind) LOCALLY. When
+;; signal-persona-origin becomes an emitting contract, these can migrate
+;; to cross-imports via the signal-persona-origin:lib:TypeName form
+;; (precedent: meta-signal-lojix cross-importing signal-lojix:lib types).
+;;
+;; OPERATION VOCABULARY. The four meta operations mirror the established
+;; router channel-authority surface exactly — no new operation is invented:
+;;   Grant   apply meta authority by creating or replacing a live grant;
+;;   Extend  change the duration of a live channel grant;
+;;   Revoke  remove a live channel grant;
+;;   Deny    record an owner decision that an adjudication request will not
+;;           receive a grant.
+;; The wire carries contract-local operation roots only — there is no
+;; public Mutate or Retract wrapper; the Sema class is a daemon-side
+;; projection.
+;;
+;; META-ORDER NAMES ARE NOT MESSAGE KINDS. Grant / extension / revocation /
+;; denial are operations on THIS contract, not categories of message routed
+;; through ordinary channels, so the ChannelMessageKind enum names none of
+;; them.
+
+[Grant Extend Revoke Deny]
+[ChannelGranted ChannelExtended ChannelRevoked AdjudicationDenied ChannelOrderRejected RequestUnimplemented]
+{
+  Grant ChannelGrant
+  Extend ChannelExtension
+  Revoke ChannelRevocation
+  Deny AdjudicationDenial
+
+  ChannelGranted GrantedChannel
+  ChannelExtended ExtendedChannel
+  ChannelRevoked RevokedChannel
+  AdjudicationDenied DeniedAdjudication
+  ChannelOrderRejected RejectedChannelOrder
+  RequestUnimplemented UnimplementedRequest
+
+  ;; The identifier a live channel is known by. Daemon-minted on Grant and
+  ;; carried back in the GrantedChannel reply; callers reference an existing
+  ;; one on Extend / Revoke. String-shaped, never owner-supplied at create.
+  ChannelIdentifier String
+
+  ;; The identifier of an adjudication request that the owner declines.
+  AdjudicationRequestIdentifier String
+
+  ;; Free text carried on a revocation or denial reason.
+  TextBody String
+
+  ;; A wall-clock instant in nanoseconds, used by a time-bound grant.
+  TimestampNanoseconds u64
+
+  ;; A supervised component instance inside the local Persona engine,
+  ;; mirrored from signal-persona-origin's ComponentName.
+  ComponentName [Mind Message Router Terminal Harness System Introspect Orchestrate Spirit]
+
+  ;; The connection trust class after ingress has crossed the operating-
+  ;; system boundary, mirrored from signal-persona-origin's ConnectionClass.
+  ;; The Unix uid is carried as u64 — the NOTA text codec implements its
+  ;; integer trait for u64 only, and a uid fits without loss.
+  UnixUserIdentifier u64
+  SystemPrincipal String
+  EngineIdentifier String
+  HostName String
+  NetworkPeer String
+  OtherPersonaEngine { engine_identifier EngineIdentifier host HostName }
+  ConnectionClass [Owner (NonOwnerUser UnixUserIdentifier) (System SystemPrincipal) (OtherPersona OtherPersonaEngine) (Network NetworkPeer)]
+
+  ;; A channel endpoint is either an internal component or an external
+  ;; connection class.
+  ChannelEndpoint [(Internal ComponentName) (External ConnectionClass)]
+
+  ;; The route categories a grant can cover. Meta-order names (grant,
+  ;; extension, revocation, denial) are deliberately absent — those are
+  ;; operations on this contract, not routed message kinds.
+  ChannelMessageKind [
+    MessageIngressSubmission
+    MessageSubmission
+    InboxQuery
+    FocusObservation
+    PromptBufferObservation
+    MessageDelivery
+    TerminalInput
+    TerminalCapture
+    TerminalResize
+    TranscriptEvent
+    AdjudicationRequest
+    DeliveryNotification
+  ]
+
+  ;; The requested lifetime of a grant: one-shot, permanent, or bounded by
+  ;; a wall-clock instant.
+  ChannelDuration [OneShot Permanent (TimeBound TimestampNanoseconds)]
+
+  ;; Grant payload — the source/destination endpoints, the covered route
+  ;; categories, and the requested duration.
+  ChannelGrant {
+    source ChannelEndpoint
+    destination ChannelEndpoint
+    kinds (Vec ChannelMessageKind)
+    duration ChannelDuration
+  }
+
+  ;; Extend payload — change the duration of an existing live channel.
+  ChannelExtension { channel ChannelIdentifier duration ChannelDuration }
+
+  ;; Revoke payload — remove a live channel, with a reason for the record.
+  ChannelRevocation { channel ChannelIdentifier reason TextBody }
+
+  ;; Deny payload — close an adjudication request without a grant.
+  AdjudicationDenial { request AdjudicationRequestIdentifier reason TextBody }
+
+  ;; Reply payloads.
+  GrantedChannel { channel ChannelIdentifier }
+  ExtendedChannel { channel ChannelIdentifier }
+  RevokedChannel { channel ChannelIdentifier }
+  DeniedAdjudication { request AdjudicationRequestIdentifier }
+
+  ;; Which operation a rejection or unimplemented reply refers back to.
+  OperationKind [Grant Extend Revoke Deny]
+
+  ;; The order was understood but rejected by router policy.
+  ChannelOrderRejectionReason [MetaAuthorityRequired ChannelAlreadyExists ChannelMissing AdjudicationRequestMissing PolicyRefused]
+  RejectedChannelOrder { operation OperationKind reason ChannelOrderRejectionReason }
+
+  ;; The request is in the contract but not implemented by the current
+  ;; runtime.
+  UnimplementedReason [NotBuiltYet DependencyNotReady PolicyStoreUnavailable]
+  UnimplementedRequest { operation OperationKind reason UnimplementedReason }
+}

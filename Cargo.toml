@@ -5,22 +5,31 @@ edition      = "2024"
 rust-version = "1.85"
 license      = "MIT OR Apache-2.0"
 repository   = "https://github.com/LiGoldragon/meta-signal-router"
-description  = "MetaSignal contract for privileged PersonaRouter channel-policy orders."
+description  = "Meta Signal contract for the PersonaRouter owner-only channel-policy surface."
 publish      = false
+links        = "meta-signal-router"
+build        = "build.rs"
 
 [lib]
 name = "meta_signal_router"
 path = "src/lib.rs"
 
+[features]
+default   = []
+nota-text = ["dep:nota-next"]
+
 [dependencies]
-signal-frame        = { git = "https://github.com/LiGoldragon/signal-frame.git", branch = "main" }
-signal-persona-origin = { git = "https://github.com/LiGoldragon/signal-persona-origin.git", branch = "main" }
-nota-codec          = { git = "https://github.com/LiGoldragon/nota-codec.git", branch = "main" }
-rkyv                = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
-thiserror           = "2"
+nota-codec = { git = "https://github.com/LiGoldragon/nota-codec.git", branch = "main" }
+nota-next  = { git = "https://github.com/LiGoldragon/nota-next.git", branch = "main", optional = true }
+rkyv       = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
+
+[build-dependencies]
+schema-rust-next = { git = "https://github.com/LiGoldragon/schema-rust-next.git", branch = "main" }
+
+[dev-dependencies]
+rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 
 [lints.rust]
 unsafe_code = "forbid"
 unused      = { level = "warn", priority = -1 }
 dead_code   = "warn"
-

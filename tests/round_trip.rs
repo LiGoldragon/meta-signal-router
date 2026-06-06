@@ -1,45 +1,30 @@
+//! Witness tests for the meta-signal-router wire contract.
+//!
+//! Proves the schema-emitted policy operations and replies round-trip
+//! through the rkyv archive and through NOTA text, that each variant maps
+//! to its contract-local short header, and that meta-order names never
+//! appear in the routed-message-kind vocabulary.
+//!
+//! The current refreshed schema-rust-next base emits, for a pure
+//! `wire_contract()` target, the wire types + NOTA codec + the
+//! `short_header` constant module. The `route()` / `encode_signal_frame`
+//! convenience surface is now gated behind a runtime-plane signal target
+//! (`emits_signal()`), so this contract carries the rkyv archive + the
+//! short-header constants as its raw wire form; the daemon wraps those in
+//! the triad-runtime length-prefixed envelope.
+
 use meta_signal_router::{
-    AdjudicationDenial, AdjudicationDenied, AdjudicationRequestIdentifier, ChannelDuration,
-    ChannelEndpoint, ChannelExtended, ChannelExtension, ChannelGrant, ChannelGranted,
-    ChannelMessageKind, ChannelOrderRejected, ChannelOrderRejectionReason, ChannelRevocation,
-    ChannelRevoked, Frame, FrameBody, MetaRouterReply, Operation, OperationKind, Request,
-    RequestUnimplemented, TextBody, TimestampNanoseconds, UnimplementedReason,
+    AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
+    ChannelMessageKind, ChannelOrderRejectionReason, ChannelRevocation, ComponentName,
+    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, OperationKind,
+    Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason, UnimplementedRequest,
+    short_header,
 };
-use nota_codec::{Decoder, Encoder, NotaDecode, NotaEncode};
-use signal_frame::{
-    ExchangeIdentifier, ExchangeLane, LaneSequence, NonEmpty, Reply, RequestPayload, SessionEpoch,
-    SubReply,
-};
-use signal_persona_origin::{ChannelIdentifier, ComponentName, ConnectionClass};
-
-fn exchange() -> ExchangeIdentifier {
-    ExchangeIdentifier::new(
-        SessionEpoch::new(1),
-        ExchangeLane::Connector,
-        LaneSequence::first(),
-    )
-}
-
-fn channel() -> ChannelIdentifier {
-    ChannelIdentifier::new("channel-aab")
-}
-
-fn adjudication_request() -> AdjudicationRequestIdentifier {
-    AdjudicationRequestIdentifier::new("adjudication-aab")
-}
-
-fn internal_endpoint(component: ComponentName) -> ChannelEndpoint {
-    ChannelEndpoint::Internal(component)
-}
-
-fn external_owner_endpoint() -> ChannelEndpoint {
-    ChannelEndpoint::External(ConnectionClass::Owner)
-}
 
 fn grant() -> ChannelGrant {
     ChannelGrant {
-        source: external_owner_endpoint(),
-        destination: internal_endpoint(ComponentName::Router),
+        source: ChannelEndpoint::External(ConnectionClass::Owner),
+        destination: ChannelEndpoint::Internal(ComponentName::Router),
         kinds: vec![
             ChannelMessageKind::MessageSubmission,
             ChannelMessageKind::InboxQuery,
@@ -48,173 +33,146 @@ fn grant() -> ChannelGrant {
     }
 }
 
-fn round_trip_request(request: Operation) -> Operation {
-    let frame = Frame::new(FrameBody::Request {
-        exchange: exchange(),
-        request: request.into_request(),
-    });
-    let bytes = frame.encode_length_prefixed().expect("encode");
-    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode");
-    match decoded.into_body() {
-        FrameBody::Request { request, .. } => request.payloads().head().clone(),
-        other => panic!("expected request operation, got {other:?}"),
-    }
+fn inputs() -> Vec<Input> {
+    vec![
+        Input::Grant(grant()),
+        Input::Extend(ChannelExtension {
+            channel: "channel-aab".to_owned(),
+            duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000),
+        }),
+        Input::Revoke(ChannelRevocation {
+            channel: "channel-aab".to_owned(),
+            reason: "operator closed the path".to_owned(),
+        }),
+        Input::Deny(AdjudicationDenial {
+            request: "adjudication-aab".to_owned(),
+            reason: "destination unavailable".to_owned(),
+        }),
+    ]
 }
 
-fn round_trip_reply(reply: MetaRouterReply) -> MetaRouterReply {
-    let frame = Frame::new(FrameBody::Reply {
-        exchange: exchange(),
-        reply: Reply::committed(NonEmpty::single(SubReply::Ok(reply))),
-    });
-    let bytes = frame.encode_length_prefixed().expect("encode");
-    let decoded = Frame::decode_length_prefixed(&bytes).expect("decode");
-    match decoded.into_body() {
-        FrameBody::Reply { reply, .. } => match reply {
-            Reply::Accepted { per_operation, .. } => match per_operation.into_head() {
-                SubReply::Ok(payload) => payload,
-                other => panic!("expected accepted reply payload, got {other:?}"),
-            },
-            other => panic!("expected accepted reply, got {other:?}"),
-        },
-        other => panic!("expected reply operation, got {other:?}"),
-    }
-}
-
-fn round_trip_nota<T>(value: T, expected: &str)
-where
-    T: NotaEncode + NotaDecode + PartialEq + std::fmt::Debug,
-{
-    let mut encoder = Encoder::new();
-    value.encode(&mut encoder).expect("encode nota text");
-    let encoded = encoder.into_string();
-    assert_eq!(encoded, expected);
-
-    let mut decoder = Decoder::new(&encoded);
-    let recovered = T::decode(&mut decoder).expect("decode nota text");
-    assert_eq!(recovered, value);
-}
-
-#[test]
-fn meta_router_requests_round_trip() {
-    let requests = vec![
-        Operation::Grant(grant()),
-        Operation::Extend(ChannelExtension {
-            channel: channel(),
-            duration: ChannelDuration::TimeBound(TimestampNanoseconds::new(
-                1_730_000_000_000_000_000,
-            )),
-        }),
-        Operation::Revoke(ChannelRevocation {
-            channel: channel(),
-            reason: TextBody::new("operator closed the path"),
-        }),
-        Operation::Deny(AdjudicationDenial {
-            request: adjudication_request(),
-            reason: TextBody::new("destination unavailable"),
-        }),
-    ];
-
-    for request in requests {
-        assert_eq!(round_trip_request(request.clone()), request);
-    }
-}
-
-#[test]
-fn meta_router_replies_round_trip() {
-    let replies = vec![
-        MetaRouterReply::ChannelGranted(ChannelGranted { channel: channel() }),
-        MetaRouterReply::ChannelExtended(ChannelExtended { channel: channel() }),
-        MetaRouterReply::ChannelRevoked(ChannelRevoked { channel: channel() }),
-        MetaRouterReply::AdjudicationDenied(AdjudicationDenied {
-            request: adjudication_request(),
-        }),
-        MetaRouterReply::ChannelOrderRejected(ChannelOrderRejected {
+fn outputs() -> Vec<Output> {
+    vec![
+        Output::ChannelGranted(GrantedChannel("channel-aab".to_owned())),
+        Output::ChannelExtended(ExtendedChannel("channel-aab".to_owned())),
+        Output::ChannelRevoked(RevokedChannel("channel-aab".to_owned())),
+        Output::AdjudicationDenied(DeniedAdjudication("adjudication-aab".to_owned())),
+        Output::ChannelOrderRejected(RejectedChannelOrder {
             operation: OperationKind::Grant,
             reason: ChannelOrderRejectionReason::PolicyRefused,
         }),
-        MetaRouterReply::RequestUnimplemented(RequestUnimplemented {
+        Output::RequestUnimplemented(UnimplementedRequest {
             operation: OperationKind::Grant,
             reason: UnimplementedReason::NotBuiltYet,
         }),
-    ];
+    ]
+}
 
-    for reply in replies {
-        assert_eq!(round_trip_reply(reply.clone()), reply);
+#[test]
+fn input_operations_round_trip_through_rkyv() {
+    for input in inputs() {
+        let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&input).expect("rkyv encode input");
+        let recovered =
+            rkyv::from_bytes::<Input, rkyv::rancor::Error>(&bytes).expect("rkyv decode input");
+        assert_eq!(recovered, input);
     }
 }
 
 #[test]
-fn meta_router_operations_encode_as_contract_local_nota_heads() {
-    let operation = Operation::Grant(grant());
-    let mut encoder = Encoder::new();
-    operation
-        .into_request()
-        .encode(&mut encoder)
-        .expect("encode");
-    let text = encoder.into_string();
+fn output_replies_round_trip_through_rkyv() {
+    for output in outputs() {
+        let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&output).expect("rkyv encode output");
+        let recovered =
+            rkyv::from_bytes::<Output, rkyv::rancor::Error>(&bytes).expect("rkyv decode output");
+        assert_eq!(recovered, output);
+    }
+}
 
-    assert_eq!(
-        text,
-        "(Grant ((External (Owner)) (Internal Router) [MessageSubmission InboxQuery] (Permanent)))"
+#[test]
+fn short_headers_are_contract_local_and_distinct() {
+    let headers = [
+        short_header::INPUT_GRANT,
+        short_header::INPUT_EXTEND,
+        short_header::INPUT_REVOKE,
+        short_header::INPUT_DENY,
+        short_header::OUTPUT_CHANNEL_GRANTED,
+        short_header::OUTPUT_CHANNEL_EXTENDED,
+        short_header::OUTPUT_CHANNEL_REVOKED,
+        short_header::OUTPUT_ADJUDICATION_DENIED,
+        short_header::OUTPUT_CHANNEL_ORDER_REJECTED,
+        short_header::OUTPUT_REQUEST_UNIMPLEMENTED,
+    ];
+    for (outer_index, outer) in headers.iter().enumerate() {
+        for (inner_index, inner) in headers.iter().enumerate() {
+            if outer_index != inner_index {
+                assert_ne!(outer, inner, "short headers must be distinct");
+            }
+        }
+    }
+}
+
+#[cfg(feature = "nota-text")]
+#[test]
+fn input_operations_round_trip_through_nota_text() {
+    for input in inputs() {
+        let text = input.to_nota();
+        let recovered: Input = text.parse().expect("parse input nota");
+        assert_eq!(recovered, input);
+        assert!(!text.contains("Mutate"));
+        assert!(!text.contains("Retract"));
+        assert!(!text.contains("Assert"));
+    }
+}
+
+#[cfg(feature = "nota-text")]
+#[test]
+fn output_replies_round_trip_through_nota_text() {
+    for output in outputs() {
+        let text = output.to_nota();
+        let recovered: Output = text.parse().expect("parse output nota");
+        assert_eq!(recovered, output);
+    }
+}
+
+#[cfg(feature = "nota-text")]
+#[test]
+fn grant_operation_encodes_as_contract_local_nota_head() {
+    let text = Input::Grant(grant()).to_nota();
+    assert!(
+        text.starts_with("(Grant"),
+        "expected Grant head, got {text}"
     );
-    assert!(!text.contains("Mutate"));
-    assert!(!text.contains("Retract"));
-    assert!(!text.contains("Assert"));
-
-    let mut decoder = Decoder::new(&text);
-    let decoded = Request::decode(&mut decoder).expect("decode");
-    assert_eq!(decoded.payloads().head().kind(), OperationKind::Grant);
+    let recovered: Input = text.parse().expect("parse grant nota");
+    assert_eq!(recovered, Input::Grant(grant()));
 }
 
-#[test]
-fn meta_router_request_exposes_contract_owned_operation_kind() {
-    let cases = vec![
-        (Operation::Grant(grant()), OperationKind::Grant),
-        (
-            Operation::Extend(ChannelExtension {
-                channel: channel(),
-                duration: ChannelDuration::OneShot,
-            }),
-            OperationKind::Extend,
-        ),
-        (
-            Operation::Revoke(ChannelRevocation {
-                channel: channel(),
-                reason: TextBody::new("operator closed the path"),
-            }),
-            OperationKind::Revoke,
-        ),
-        (
-            Operation::Deny(AdjudicationDenial {
-                request: adjudication_request(),
-                reason: TextBody::new("destination unavailable"),
-            }),
-            OperationKind::Deny,
-        ),
-    ];
-
-    for (request, operation) in cases {
-        assert_eq!(request.kind(), operation);
-    }
-}
-
+#[cfg(feature = "nota-text")]
 #[test]
 fn meta_order_names_are_not_channel_message_kinds() {
-    for kind in ChannelMessageKind::ALL {
-        let mut encoder = Encoder::new();
-        kind.encode(&mut encoder).expect("encode");
-        let encoded = encoder.into_string();
-
-        assert_ne!(encoded, "ChannelGrant");
-        assert_ne!(encoded, "ChannelExtend");
-        assert_ne!(encoded, "ChannelRetract");
-        assert_ne!(encoded, "AdjudicationDeny");
-        assert_ne!(encoded, "AdjudicationDenial");
-    }
-
-    round_trip_nota(
+    let kinds = [
         ChannelMessageKind::MessageIngressSubmission,
-        "MessageIngressSubmission",
-    );
-    round_trip_nota(ChannelMessageKind::MessageSubmission, "MessageSubmission");
+        ChannelMessageKind::MessageSubmission,
+        ChannelMessageKind::InboxQuery,
+        ChannelMessageKind::FocusObservation,
+        ChannelMessageKind::PromptBufferObservation,
+        ChannelMessageKind::MessageDelivery,
+        ChannelMessageKind::TerminalInput,
+        ChannelMessageKind::TerminalCapture,
+        ChannelMessageKind::TerminalResize,
+        ChannelMessageKind::TranscriptEvent,
+        ChannelMessageKind::AdjudicationRequest,
+        ChannelMessageKind::DeliveryNotification,
+    ];
+    for kind in kinds {
+        let text = kind.to_nota();
+        assert_ne!(text, "ChannelGrant");
+        assert_ne!(text, "ChannelExtend");
+        assert_ne!(text, "ChannelRevoke");
+        assert_ne!(text, "AdjudicationDeny");
+        assert_ne!(text, "AdjudicationDenial");
+        assert_ne!(text, "Grant");
+        assert_ne!(text, "Extend");
+        assert_ne!(text, "Revoke");
+        assert_ne!(text, "Deny");
+    }
 }
