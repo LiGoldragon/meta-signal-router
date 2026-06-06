@@ -1,5 +1,5 @@
-//! Meta (owner-only policy) Signal contract for the PersonaRouter
-//! channel-authority surface.
+//! Meta policy Signal contract for the PersonaRouter channel-authority
+//! surface.
 //!
 //! Wire-only: the rkyv + NOTA codec and the signal-frame mail envelope for
 //! the meta channel-policy operations — granting, extending, revoking a

@@ -2,8 +2,6 @@
 
 *Meta-signal Signal contract for PersonaRouter channel policy.*
 
----
-
 ## 0 · TL;DR
 
 `meta-signal-router` is the policy signal for
@@ -41,7 +39,7 @@ The initial surface is deliberately small:
 | `Grant` | `Mutate` | Apply meta authority by creating or replacing a live channel grant. |
 | `Extend` | `Mutate` | Change the duration of a live channel grant. |
 | `Revoke` | `Retract` | Remove a live channel grant. |
-| `Deny` | `Mutate` | Record an owner decision that an adjudication request will not receive a grant. |
+| `Deny` | `Mutate` | Record a meta-policy decision that an adjudication request will not receive a grant. |
 
 The Sema classes above are daemon-side projections. The wire carries
 contract-local operation roots only; there is no public `Mutate` or
@@ -116,20 +114,19 @@ This crate is a real emitting wire contract, not a hand-written
 mirror. `schema/lib.schema` is the single source of truth; `build.rs`
 runs `schema-rust-next`'s `GenerationPlan::wire_contract` driver, which
 emits the `Input`/`Output` enums, the policy payload records and reply
-types, the NOTA codec (gated behind the `nota-text` feature), and the
-`short_header` constant module into the checked-in artifact at
-`src/schema/lib.rs`. The driver's `write_or_check` step asserts those
-artifacts stay byte-identical on every ordinary build; regenerate them
-with `META_SIGNAL_ROUTER_UPDATE_SCHEMA_ARTIFACTS=1 cargo build
+types, the NOTA codec (gated behind the `nota-text` feature), the
+route witnesses, the `short_header` constants, and the
+`encode_signal_frame` / `decode_signal_frame` helpers into the
+checked-in artifact at `src/schema/lib.rs`. The driver's
+`write_or_check` step asserts those artifacts stay byte-identical on
+every ordinary build; regenerate them with
+`META_SIGNAL_ROUTER_UPDATE_SCHEMA_ARTIFACTS=1 cargo build
 --all-features` after any schema edit.
 
-The current refreshed `schema-rust-next` base emits, for a pure
-`wire_contract()` target, the wire types plus the `short_header`
-constants. The `route()` / `encode_signal_frame` convenience surface is
-gated behind a runtime-plane signal target (`emits_signal()`), so the
-raw wire form here is the rkyv archive prefixed by the contract-local
-short header; the `router` daemon wraps those bytes in the
-triad-runtime length-prefixed envelope.
+The raw contract frame is a contract-local short header followed by the
+rkyv archive. The `router` daemon will carry those bytes through the
+triad-runtime length-prefixed process envelope when it binds the meta
+listener.
 
 ## 6 · Witness Tests
 
@@ -137,6 +134,8 @@ triad-runtime length-prefixed envelope.
 
 - operations round-trip through the rkyv archive;
 - replies round-trip through the rkyv archive;
+- operations and replies round-trip through the emitted signal-frame
+  helpers;
 - the `short_header` constants are contract-local and distinct;
 - operations and replies round-trip through NOTA text and carry
   contract-local verb heads (`(Grant …)`) with no `Mutate`/`Retract`

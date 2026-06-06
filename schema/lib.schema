@@ -28,8 +28,8 @@
 ;;   Grant   apply meta authority by creating or replacing a live grant;
 ;;   Extend  change the duration of a live channel grant;
 ;;   Revoke  remove a live channel grant;
-;;   Deny    record an owner decision that an adjudication request will not
-;;           receive a grant.
+;;   Deny    record a meta-policy decision that an adjudication request will
+;;           not receive a grant.
 ;; The wire carries contract-local operation roots only — there is no
 ;; public Mutate or Retract wrapper; the Sema class is a daemon-side
 ;; projection.
@@ -56,10 +56,10 @@
 
   ;; The identifier a live channel is known by. Daemon-minted on Grant and
   ;; carried back in the GrantedChannel reply; callers reference an existing
-  ;; one on Extend / Revoke. String-shaped, never owner-supplied at create.
+  ;; one on Extend / Revoke. String-shaped, never caller-supplied at create.
   ChannelIdentifier String
 
-  ;; The identifier of an adjudication request that the owner declines.
+  ;; The identifier of an adjudication request that meta policy declines.
   AdjudicationRequestIdentifier String
 
   ;; Free text carried on a revocation or denial reason.

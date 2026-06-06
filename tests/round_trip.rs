@@ -6,12 +6,10 @@
 //! appear in the routed-message-kind vocabulary.
 //!
 //! The current refreshed schema-rust-next base emits, for a pure
-//! `wire_contract()` target, the wire types + NOTA codec + the
-//! `short_header` constant module. The `route()` / `encode_signal_frame`
-//! convenience surface is now gated behind a runtime-plane signal target
-//! (`emits_signal()`), so this contract carries the rkyv archive + the
-//! short-header constants as its raw wire form; the daemon wraps those in
-//! the triad-runtime length-prefixed envelope.
+//! `wire_contract()` target, the wire types + NOTA codec + route
+//! witnesses + the `short_header` constant module + signal-frame helpers.
+//! The daemon wraps those contract frames in the triad-runtime
+//! length-prefixed envelope.
 
 use meta_signal_router::{
     AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
@@ -84,6 +82,32 @@ fn output_replies_round_trip_through_rkyv() {
         let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&output).expect("rkyv encode output");
         let recovered =
             rkyv::from_bytes::<Output, rkyv::rancor::Error>(&bytes).expect("rkyv decode output");
+        assert_eq!(recovered, output);
+    }
+}
+
+#[test]
+fn input_operations_round_trip_through_signal_frame() {
+    for input in inputs() {
+        let frame = input
+            .encode_signal_frame()
+            .expect("encode input signal frame");
+        let (route, recovered) =
+            Input::decode_signal_frame(&frame).expect("decode input signal frame");
+        assert_eq!(route, input.route());
+        assert_eq!(recovered, input);
+    }
+}
+
+#[test]
+fn output_replies_round_trip_through_signal_frame() {
+    for output in outputs() {
+        let frame = output
+            .encode_signal_frame()
+            .expect("encode output signal frame");
+        let (route, recovered) =
+            Output::decode_signal_frame(&frame).expect("decode output signal frame");
+        assert_eq!(route, output.route());
         assert_eq!(recovered, output);
     }
 }

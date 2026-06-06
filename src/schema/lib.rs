@@ -6,9 +6,7 @@ pub type Boolean = bool;
 pub type Path = std::string::String;
 
 #[cfg(feature = "nota-text")]
-pub use nota_next::{
-    NotaDecode, NotaDecodeError, NotaEncode, NotaSource,
-};
+pub use nota_next::{NotaDecode, NotaDecodeError, NotaEncode, NotaSource};
 
 pub type Grant = ChannelGrant;
 
@@ -222,16 +220,13 @@ impl GrantedChannel {
     pub fn new(payload: ChannelIdentifier) -> Self {
         Self(payload)
     }
-
     pub fn payload(&self) -> &ChannelIdentifier {
         &self.0
     }
-
     pub fn into_payload(self) -> ChannelIdentifier {
         self.0
     }
 }
-
 impl From<ChannelIdentifier> for GrantedChannel {
     fn from(payload: ChannelIdentifier) -> Self {
         Self::new(payload)
@@ -242,16 +237,13 @@ impl ExtendedChannel {
     pub fn new(payload: ChannelIdentifier) -> Self {
         Self(payload)
     }
-
     pub fn payload(&self) -> &ChannelIdentifier {
         &self.0
     }
-
     pub fn into_payload(self) -> ChannelIdentifier {
         self.0
     }
 }
-
 impl From<ChannelIdentifier> for ExtendedChannel {
     fn from(payload: ChannelIdentifier) -> Self {
         Self::new(payload)
@@ -262,16 +254,13 @@ impl RevokedChannel {
     pub fn new(payload: ChannelIdentifier) -> Self {
         Self(payload)
     }
-
     pub fn payload(&self) -> &ChannelIdentifier {
         &self.0
     }
-
     pub fn into_payload(self) -> ChannelIdentifier {
         self.0
     }
 }
-
 impl From<ChannelIdentifier> for RevokedChannel {
     fn from(payload: ChannelIdentifier) -> Self {
         Self::new(payload)
@@ -282,16 +271,13 @@ impl DeniedAdjudication {
     pub fn new(payload: AdjudicationRequestIdentifier) -> Self {
         Self(payload)
     }
-
     pub fn payload(&self) -> &AdjudicationRequestIdentifier {
         &self.0
     }
-
     pub fn into_payload(self) -> AdjudicationRequestIdentifier {
         self.0
     }
 }
-
 impl From<AdjudicationRequestIdentifier> for DeniedAdjudication {
     fn from(payload: AdjudicationRequestIdentifier) -> Self {
         Self::new(payload)
@@ -302,15 +288,12 @@ impl ConnectionClass {
     pub fn non_owner_user(payload: UnixUserIdentifier) -> Self {
         Self::NonOwnerUser(payload)
     }
-
     pub fn system(payload: SystemPrincipal) -> Self {
         Self::System(payload)
     }
-
     pub fn other_persona(payload: OtherPersonaEngine) -> Self {
         Self::OtherPersona(payload)
     }
-
     pub fn network(payload: NetworkPeer) -> Self {
         Self::Network(payload)
     }
@@ -320,7 +303,6 @@ impl ChannelEndpoint {
     pub fn internal(payload: ComponentName) -> Self {
         Self::Internal(payload)
     }
-
     pub fn external(payload: ConnectionClass) -> Self {
         Self::External(payload)
     }
@@ -336,15 +318,12 @@ impl Input {
     pub fn grant(payload: Grant) -> Self {
         Self::Grant(payload)
     }
-
     pub fn extend(payload: Extend) -> Self {
         Self::Extend(payload)
     }
-
     pub fn revoke(payload: Revoke) -> Self {
         Self::Revoke(payload)
     }
-
     pub fn deny(payload: Deny) -> Self {
         Self::Deny(payload)
     }
@@ -354,23 +333,18 @@ impl Output {
     pub fn channel_granted(payload: ChannelGranted) -> Self {
         Self::ChannelGranted(payload)
     }
-
     pub fn channel_extended(payload: ChannelExtended) -> Self {
         Self::ChannelExtended(payload)
     }
-
     pub fn channel_revoked(payload: ChannelRevoked) -> Self {
         Self::ChannelRevoked(payload)
     }
-
     pub fn adjudication_denied(payload: AdjudicationDenied) -> Self {
         Self::AdjudicationDenied(payload)
     }
-
     pub fn channel_order_rejected(payload: ChannelOrderRejected) -> Self {
         Self::ChannelOrderRejected(payload)
     }
-
     pub fn request_unimplemented(payload: RequestUnimplemented) -> Self {
         Self::RequestUnimplemented(payload)
     }
@@ -399,7 +373,6 @@ impl ComponentName {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -410,7 +383,6 @@ impl OtherPersonaEngine {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -421,7 +393,6 @@ impl ConnectionClass {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -432,7 +403,6 @@ impl ChannelEndpoint {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -443,7 +413,6 @@ impl ChannelMessageKind {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -454,7 +423,6 @@ impl ChannelDuration {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -465,7 +433,6 @@ impl ChannelGrant {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -476,7 +443,6 @@ impl ChannelExtension {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -487,7 +453,6 @@ impl ChannelRevocation {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -498,7 +463,6 @@ impl AdjudicationDenial {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -509,7 +473,6 @@ impl GrantedChannel {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -520,7 +483,6 @@ impl ExtendedChannel {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -531,7 +493,6 @@ impl RevokedChannel {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -542,7 +503,6 @@ impl DeniedAdjudication {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -553,7 +513,6 @@ impl OperationKind {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -564,7 +523,6 @@ impl ChannelOrderRejectionReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -575,7 +533,6 @@ impl RejectedChannelOrder {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -586,7 +543,6 @@ impl UnimplementedReason {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -597,7 +553,6 @@ impl UnimplementedRequest {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -608,7 +563,6 @@ impl Input {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -617,12 +571,10 @@ impl Input {
 #[cfg(feature = "nota-text")]
 impl std::str::FromStr for Input {
     type Err = NotaDecodeError;
-
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         NotaSource::new(source).parse::<Self>()
     }
 }
-
 #[cfg(feature = "nota-text")]
 impl std::fmt::Display for Input {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -635,7 +587,6 @@ impl Output {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
         <Self as NotaDecode>::from_nota_block(block)
     }
-
     pub fn to_nota(&self) -> String {
         <Self as NotaEncode>::to_nota(self)
     }
@@ -644,12 +595,10 @@ impl Output {
 #[cfg(feature = "nota-text")]
 impl std::str::FromStr for Output {
     type Err = NotaDecodeError;
-
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         NotaSource::new(source).parse::<Self>()
     }
 }
-
 #[cfg(feature = "nota-text")]
 impl std::fmt::Display for Output {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -668,5 +617,226 @@ pub mod short_header {
     pub const OUTPUT_ADJUDICATION_DENIED: u64 = 0x0103000000000000;
     pub const OUTPUT_CHANNEL_ORDER_REJECTED: u64 = 0x0104000000000000;
     pub const OUTPUT_REQUEST_UNIMPLEMENTED: u64 = 0x0105000000000000;
+}
+
+const SIGNAL_SHORT_HEADER_BYTE_COUNT: usize = 8;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SignalFrameError {
+    ArchiveEncode,
+    ArchiveDecode,
+    FrameTooShort { found: usize },
+    UnknownHeader { root_enum: &'static str, header: u64 },
+    HeaderMismatch { expected: u64, found: u64 },
+}
+impl std::fmt::Display for SignalFrameError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ArchiveEncode => formatter.write_str("failed to encode rkyv archive"),
+            Self::ArchiveDecode => formatter.write_str("failed to decode rkyv archive"),
+            Self::FrameTooShort { found } => {
+                write!(formatter, "signal frame too short: {found} bytes")
+            }
+            Self::UnknownHeader { root_enum, header } => {
+                write!(formatter, "unknown {root_enum} short header 0x{header:016X}")
+            }
+            Self::HeaderMismatch { expected, found } => {
+                write!(
+                    formatter,
+                    "decoded payload header mismatch: expected 0x{expected:016X}, found 0x{found:016X}"
+                )
+            }
+        }
+    }
+}
+impl std::error::Error for SignalFrameError {}
+
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum InputRoute {
+    Grant,
+    Extend,
+    Revoke,
+    Deny,
+}
+
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(
+    rkyv::Archive,
+    rkyv::Serialize,
+    rkyv::Deserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub enum OutputRoute {
+    ChannelGranted,
+    ChannelExtended,
+    ChannelRevoked,
+    AdjudicationDenied,
+    ChannelOrderRejected,
+    RequestUnimplemented,
+}
+
+impl Input {
+    pub fn route(&self) -> InputRoute {
+        match self {
+            Self::Grant(_) => InputRoute::Grant,
+            Self::Extend(_) => InputRoute::Extend,
+            Self::Revoke(_) => InputRoute::Revoke,
+            Self::Deny(_) => InputRoute::Deny,
+        }
+    }
+    pub fn short_header(&self) -> u64 {
+        match self {
+            Self::Grant(_) => short_header::INPUT_GRANT,
+            Self::Extend(_) => short_header::INPUT_EXTEND,
+            Self::Revoke(_) => short_header::INPUT_REVOKE,
+            Self::Deny(_) => short_header::INPUT_DENY,
+        }
+    }
+    pub fn route_from_short_header(header: u64) -> Result<InputRoute, SignalFrameError> {
+        match header {
+            short_header::INPUT_GRANT => Ok(InputRoute::Grant),
+            short_header::INPUT_EXTEND => Ok(InputRoute::Extend),
+            short_header::INPUT_REVOKE => Ok(InputRoute::Revoke),
+            short_header::INPUT_DENY => Ok(InputRoute::Deny),
+            _ => {
+                Err(SignalFrameError::UnknownHeader {
+                    root_enum: "Input",
+                    header,
+                })
+            }
+        }
+    }
+    pub fn encode_signal_frame(&self) -> Result<Vec<u8>, SignalFrameError> {
+        let archive = rkyv::to_bytes::<rkyv::rancor::Error>(self)
+            .map_err(|_| SignalFrameError::ArchiveEncode)?;
+        let mut frame = Vec::with_capacity(
+            SIGNAL_SHORT_HEADER_BYTE_COUNT + archive.len(),
+        );
+        frame.extend_from_slice(&self.short_header().to_le_bytes());
+        frame.extend_from_slice(&archive);
+        Ok(frame)
+    }
+    pub fn decode_signal_frame(
+        frame: &[u8],
+    ) -> Result<(InputRoute, Self), SignalFrameError> {
+        if frame.len() < SIGNAL_SHORT_HEADER_BYTE_COUNT {
+            return Err(SignalFrameError::FrameTooShort {
+                found: frame.len(),
+            });
+        }
+        let mut header_bytes = [0_u8; SIGNAL_SHORT_HEADER_BYTE_COUNT];
+        header_bytes.copy_from_slice(&frame[..SIGNAL_SHORT_HEADER_BYTE_COUNT]);
+        let header = u64::from_le_bytes(header_bytes);
+        let route = Self::route_from_short_header(header)?;
+        let value = rkyv::from_bytes::<
+            Self,
+            rkyv::rancor::Error,
+        >(&frame[SIGNAL_SHORT_HEADER_BYTE_COUNT..])
+            .map_err(|_| SignalFrameError::ArchiveDecode)?;
+        let expected = value.short_header();
+        if expected != header {
+            return Err(SignalFrameError::HeaderMismatch {
+                expected,
+                found: header,
+            });
+        }
+        Ok((route, value))
+    }
+}
+
+impl Output {
+    pub fn route(&self) -> OutputRoute {
+        match self {
+            Self::ChannelGranted(_) => OutputRoute::ChannelGranted,
+            Self::ChannelExtended(_) => OutputRoute::ChannelExtended,
+            Self::ChannelRevoked(_) => OutputRoute::ChannelRevoked,
+            Self::AdjudicationDenied(_) => OutputRoute::AdjudicationDenied,
+            Self::ChannelOrderRejected(_) => OutputRoute::ChannelOrderRejected,
+            Self::RequestUnimplemented(_) => OutputRoute::RequestUnimplemented,
+        }
+    }
+    pub fn short_header(&self) -> u64 {
+        match self {
+            Self::ChannelGranted(_) => short_header::OUTPUT_CHANNEL_GRANTED,
+            Self::ChannelExtended(_) => short_header::OUTPUT_CHANNEL_EXTENDED,
+            Self::ChannelRevoked(_) => short_header::OUTPUT_CHANNEL_REVOKED,
+            Self::AdjudicationDenied(_) => short_header::OUTPUT_ADJUDICATION_DENIED,
+            Self::ChannelOrderRejected(_) => short_header::OUTPUT_CHANNEL_ORDER_REJECTED,
+            Self::RequestUnimplemented(_) => short_header::OUTPUT_REQUEST_UNIMPLEMENTED,
+        }
+    }
+    pub fn route_from_short_header(
+        header: u64,
+    ) -> Result<OutputRoute, SignalFrameError> {
+        match header {
+            short_header::OUTPUT_CHANNEL_GRANTED => Ok(OutputRoute::ChannelGranted),
+            short_header::OUTPUT_CHANNEL_EXTENDED => Ok(OutputRoute::ChannelExtended),
+            short_header::OUTPUT_CHANNEL_REVOKED => Ok(OutputRoute::ChannelRevoked),
+            short_header::OUTPUT_ADJUDICATION_DENIED => {
+                Ok(OutputRoute::AdjudicationDenied)
+            }
+            short_header::OUTPUT_CHANNEL_ORDER_REJECTED => {
+                Ok(OutputRoute::ChannelOrderRejected)
+            }
+            short_header::OUTPUT_REQUEST_UNIMPLEMENTED => {
+                Ok(OutputRoute::RequestUnimplemented)
+            }
+            _ => {
+                Err(SignalFrameError::UnknownHeader {
+                    root_enum: "Output",
+                    header,
+                })
+            }
+        }
+    }
+    pub fn encode_signal_frame(&self) -> Result<Vec<u8>, SignalFrameError> {
+        let archive = rkyv::to_bytes::<rkyv::rancor::Error>(self)
+            .map_err(|_| SignalFrameError::ArchiveEncode)?;
+        let mut frame = Vec::with_capacity(
+            SIGNAL_SHORT_HEADER_BYTE_COUNT + archive.len(),
+        );
+        frame.extend_from_slice(&self.short_header().to_le_bytes());
+        frame.extend_from_slice(&archive);
+        Ok(frame)
+    }
+    pub fn decode_signal_frame(
+        frame: &[u8],
+    ) -> Result<(OutputRoute, Self), SignalFrameError> {
+        if frame.len() < SIGNAL_SHORT_HEADER_BYTE_COUNT {
+            return Err(SignalFrameError::FrameTooShort {
+                found: frame.len(),
+            });
+        }
+        let mut header_bytes = [0_u8; SIGNAL_SHORT_HEADER_BYTE_COUNT];
+        header_bytes.copy_from_slice(&frame[..SIGNAL_SHORT_HEADER_BYTE_COUNT]);
+        let header = u64::from_le_bytes(header_bytes);
+        let route = Self::route_from_short_header(header)?;
+        let value = rkyv::from_bytes::<
+            Self,
+            rkyv::rancor::Error,
+        >(&frame[SIGNAL_SHORT_HEADER_BYTE_COUNT..])
+            .map_err(|_| SignalFrameError::ArchiveDecode)?;
+        let expected = value.short_header();
+        if expected != header {
+            return Err(SignalFrameError::HeaderMismatch {
+                expected,
+                found: header,
+            });
+        }
+        Ok((route, value))
+    }
 }
 
