@@ -1,7 +1,7 @@
 # INTENT — meta-signal-router
 
 *The meta-signal wire contract for PersonaRouter channel policy. Defines the typed
-request/reply channel that `persona-orchestrate` uses to grant, extend, revoke,
+request/reply channel that `orchestrate` uses to grant, extend, revoke,
 or deny channel authority in the router.
 Companion to `ARCHITECTURE.md` and `Cargo.toml`. Maintenance: `primary/skills/repo-intent.md`.*
 
@@ -15,7 +15,7 @@ traffic stays in `signal-router/INTENT.md`.
 ## Why this repo exists
 
 `meta-signal-router` is the **meta-signal policy signal** for PersonaRouter
-channel authority. The caller is `persona-orchestrate`, because Orchestrate owns
+channel authority. The caller is `orchestrate`, because Orchestrate owns
 Router in the authority graph: Mind decides whether channel policy should change,
 orders Orchestrate through `meta-signal-orchestrate`, and Orchestrate
 enacts that decision here. Ordinary router observation traffic stays in

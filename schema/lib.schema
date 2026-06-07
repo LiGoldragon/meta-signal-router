@@ -9,7 +9,7 @@
 ;;
 ;; This is the meta policy signal leg of the router component triad
 ;; (router daemon + signal-router working signal + meta-signal-router).
-;; The caller is persona-orchestrate, because Orchestrate owns Router in
+;; The caller is orchestrate, because Orchestrate owns Router in
 ;; the authority graph. Mind decides whether channel policy should change,
 ;; orders Orchestrate through meta-signal-orchestrate, and Orchestrate
 ;; enacts that decision here. Ordinary router observation traffic stays in

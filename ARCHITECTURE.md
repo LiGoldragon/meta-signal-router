@@ -30,9 +30,9 @@ The initial surface is deliberately small:
 
 | Side | Component |
 |---|---|
-| Request producer | `persona-orchestrate` meta-signal actor. |
+| Request producer | `orchestrate` meta-signal actor. |
 | Request consumer | `router` meta-signal actor. |
-| Decision source upstream | `persona-mind`, through `meta-signal-orchestrate`. |
+| Decision source upstream | `mind`, through `meta-signal-orchestrate`. |
 
 | Operation | Projected Sema class | Meaning |
 |---|---|---|
@@ -88,7 +88,7 @@ This repo does not own:
 - bootstrap policy files;
 - ordinary router observation traffic in `signal-router`;
 - Mind graph, work graph, or adjudication observation records in
-  `signal-persona-mind`;
+  `signal-mind`;
 - CLI argv parsing or socket permissions.
 
 ## 4 · Constraints
@@ -156,7 +156,7 @@ tests/round_trip.rs   rkyv + NOTA round trips and contract-local witnesses
 
 - `../signal-router/ARCHITECTURE.md`
 - `../router/ARCHITECTURE.md`
-- `../signal-persona-mind/ARCHITECTURE.md`
+- `../signal-mind/ARCHITECTURE.md`
 - `../signal-frame/ARCHITECTURE.md`
 - `../signal-sema/ARCHITECTURE.md`
 - `~/primary/skills/contract-repo.md`
