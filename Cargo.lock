@@ -108,6 +108,7 @@ dependencies = [
  "nota-next",
  "rkyv",
  "schema-rust-next",
+ "signal-frame",
 ]
 
 [[package]]
@@ -154,6 +155,12 @@ name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+
+[[package]]
+name = "paste"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "pin-project-lite"
@@ -275,7 +282,7 @@ dependencies = [
 [[package]]
 name = "schema-rust-next"
 version = "0.5.1"
-source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#117bda3c249e4d669d42418ad5172b1986873b0f"
+source = "git+https://github.com/LiGoldragon/schema-rust-next.git?branch=main#0a845c374a2fa04e4040517ffac312d90441c486"
 dependencies = [
  "prettyplease",
  "proc-macro2",
@@ -283,6 +290,28 @@ dependencies = [
  "schema-next",
  "syn",
  "thiserror",
+]
+
+[[package]]
+name = "signal-frame"
+version = "0.2.1"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#166bda84dc63bf8461fff11a41c43d6a1c92a941"
+dependencies = [
+ "nota-next",
+ "paste",
+ "rkyv",
+ "signal-frame-macros",
+ "thiserror",
+]
+
+[[package]]
+name = "signal-frame-macros"
+version = "0.1.1"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#166bda84dc63bf8461fff11a41c43d6a1c92a941"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
