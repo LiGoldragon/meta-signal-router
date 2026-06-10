@@ -14,46 +14,74 @@ pub type Path = std::string::String;
 pub use nota_next::{NotaDecode, NotaDecodeError, NotaEncode, NotaSource};
 
 #[rustfmt::skip]
-pub type Grant = ChannelGrant;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Grant(ChannelGrant);
 
 #[rustfmt::skip]
-pub type Extend = ChannelExtension;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Extend(ChannelExtension);
 
 #[rustfmt::skip]
-pub type Revoke = ChannelRevocation;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Revoke(ChannelRevocation);
 
 #[rustfmt::skip]
-pub type Deny = AdjudicationDenial;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Deny(AdjudicationDenial);
 
 #[rustfmt::skip]
-pub type ChannelGranted = GrantedChannel;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ChannelGranted(GrantedChannel);
 
 #[rustfmt::skip]
-pub type ChannelExtended = ExtendedChannel;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ChannelExtended(ExtendedChannel);
 
 #[rustfmt::skip]
-pub type ChannelRevoked = RevokedChannel;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ChannelRevoked(RevokedChannel);
 
 #[rustfmt::skip]
-pub type AdjudicationDenied = DeniedAdjudication;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AdjudicationDenied(DeniedAdjudication);
 
 #[rustfmt::skip]
-pub type ChannelOrderRejected = RejectedChannelOrder;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ChannelOrderRejected(RejectedChannelOrder);
 
 #[rustfmt::skip]
-pub type RequestUnimplemented = UnimplementedRequest;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RequestUnimplemented(UnimplementedRequest);
 
 #[rustfmt::skip]
-pub type ChannelIdentifier = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ChannelIdentifier(String);
 
 #[rustfmt::skip]
-pub type AdjudicationRequestIdentifier = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AdjudicationRequestIdentifier(String);
 
 #[rustfmt::skip]
-pub type TextBody = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TextBody(String);
 
 #[rustfmt::skip]
-pub type TimestampNanoseconds = u64;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TimestampNanoseconds(u64);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -80,19 +108,29 @@ pub enum ComponentName {
 }
 
 #[rustfmt::skip]
-pub type UnixUserIdentifier = u64;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UnixUserIdentifier(u64);
 
 #[rustfmt::skip]
-pub type SystemPrincipal = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SystemPrincipal(String);
 
 #[rustfmt::skip]
-pub type EngineIdentifier = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EngineIdentifier(String);
 
 #[rustfmt::skip]
-pub type HostName = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct HostName(String);
 
 #[rustfmt::skip]
-pub type NetworkPeer = String;
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct NetworkPeer(String);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -194,22 +232,22 @@ pub struct AdjudicationDenial {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct GrantedChannel(pub ChannelIdentifier);
+pub struct GrantedChannel(ChannelIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ExtendedChannel(pub ChannelIdentifier);
+pub struct ExtendedChannel(ChannelIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct RevokedChannel(pub ChannelIdentifier);
+pub struct RevokedChannel(ChannelIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct DeniedAdjudication(pub AdjudicationRequestIdentifier);
+pub struct DeniedAdjudication(AdjudicationRequestIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -307,6 +345,367 @@ pub enum Output {
 }
 
 #[rustfmt::skip]
+impl Grant {
+    pub fn new(payload: ChannelGrant) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelGrant {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelGrant {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelGrant> for Grant {
+    fn from(payload: ChannelGrant) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Extend {
+    pub fn new(payload: ChannelExtension) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelExtension {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelExtension {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelExtension> for Extend {
+    fn from(payload: ChannelExtension) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Revoke {
+    pub fn new(payload: ChannelRevocation) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelRevocation {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelRevocation {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelRevocation> for Revoke {
+    fn from(payload: ChannelRevocation) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Deny {
+    pub fn new(payload: AdjudicationDenial) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &AdjudicationDenial {
+        &self.0
+    }
+    pub fn into_payload(self) -> AdjudicationDenial {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<AdjudicationDenial> for Deny {
+    fn from(payload: AdjudicationDenial) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ChannelGranted {
+    pub fn new(payload: GrantedChannel) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &GrantedChannel {
+        &self.0
+    }
+    pub fn into_payload(self) -> GrantedChannel {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<GrantedChannel> for ChannelGranted {
+    fn from(payload: GrantedChannel) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ChannelExtended {
+    pub fn new(payload: ExtendedChannel) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ExtendedChannel {
+        &self.0
+    }
+    pub fn into_payload(self) -> ExtendedChannel {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ExtendedChannel> for ChannelExtended {
+    fn from(payload: ExtendedChannel) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ChannelRevoked {
+    pub fn new(payload: RevokedChannel) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RevokedChannel {
+        &self.0
+    }
+    pub fn into_payload(self) -> RevokedChannel {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RevokedChannel> for ChannelRevoked {
+    fn from(payload: RevokedChannel) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl AdjudicationDenied {
+    pub fn new(payload: DeniedAdjudication) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &DeniedAdjudication {
+        &self.0
+    }
+    pub fn into_payload(self) -> DeniedAdjudication {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<DeniedAdjudication> for AdjudicationDenied {
+    fn from(payload: DeniedAdjudication) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ChannelOrderRejected {
+    pub fn new(payload: RejectedChannelOrder) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &RejectedChannelOrder {
+        &self.0
+    }
+    pub fn into_payload(self) -> RejectedChannelOrder {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<RejectedChannelOrder> for ChannelOrderRejected {
+    fn from(payload: RejectedChannelOrder) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl RequestUnimplemented {
+    pub fn new(payload: UnimplementedRequest) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &UnimplementedRequest {
+        &self.0
+    }
+    pub fn into_payload(self) -> UnimplementedRequest {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<UnimplementedRequest> for RequestUnimplemented {
+    fn from(payload: UnimplementedRequest) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ChannelIdentifier {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for ChannelIdentifier {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl AdjudicationRequestIdentifier {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for AdjudicationRequestIdentifier {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TextBody {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for TextBody {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl TimestampNanoseconds {
+    pub fn new(payload: u64) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &u64 {
+        &self.0
+    }
+    pub fn into_payload(self) -> u64 {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<u64> for TimestampNanoseconds {
+    fn from(payload: u64) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl UnixUserIdentifier {
+    pub fn new(payload: u64) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &u64 {
+        &self.0
+    }
+    pub fn into_payload(self) -> u64 {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<u64> for UnixUserIdentifier {
+    fn from(payload: u64) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl SystemPrincipal {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for SystemPrincipal {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl EngineIdentifier {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for EngineIdentifier {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl HostName {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for HostName {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl NetworkPeer {
+    pub fn new(payload: impl Into<String>) -> Self {
+        Self(payload.into())
+    }
+    pub fn payload(&self) -> &String {
+        &self.0
+    }
+    pub fn into_payload(self) -> String {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<String> for NetworkPeer {
+    fn from(payload: String) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl GrantedChannel {
     pub fn new(payload: ChannelIdentifier) -> Self {
         Self(payload)
@@ -384,17 +783,17 @@ impl From<AdjudicationRequestIdentifier> for DeniedAdjudication {
 
 #[rustfmt::skip]
 impl ConnectionClass {
-    pub fn non_owner_user(payload: UnixUserIdentifier) -> Self {
-        Self::NonOwnerUser(payload)
+    pub fn non_owner_user(payload: u64) -> Self {
+        Self::NonOwnerUser(UnixUserIdentifier::new(payload))
     }
-    pub fn system(payload: SystemPrincipal) -> Self {
-        Self::System(payload)
+    pub fn system(payload: String) -> Self {
+        Self::System(SystemPrincipal::new(payload))
     }
     pub fn other_persona(payload: OtherPersonaEngine) -> Self {
         Self::OtherPersona(payload)
     }
-    pub fn network(payload: NetworkPeer) -> Self {
-        Self::Network(payload)
+    pub fn network(payload: String) -> Self {
+        Self::Network(NetworkPeer::new(payload))
     }
 }
 
@@ -410,46 +809,60 @@ impl ChannelEndpoint {
 
 #[rustfmt::skip]
 impl ChannelDuration {
-    pub fn time_bound(payload: TimestampNanoseconds) -> Self {
-        Self::TimeBound(payload)
+    pub fn time_bound(payload: u64) -> Self {
+        Self::TimeBound(TimestampNanoseconds::new(payload))
     }
 }
 
 #[rustfmt::skip]
 impl Input {
-    pub fn grant(payload: Grant) -> Self {
-        Self::Grant(payload)
+    pub fn grant(payload: ChannelGrant) -> Self {
+        Self::Grant(Grant::new(payload))
     }
-    pub fn extend(payload: Extend) -> Self {
-        Self::Extend(payload)
+    pub fn extend(payload: ChannelExtension) -> Self {
+        Self::Extend(Extend::new(payload))
     }
-    pub fn revoke(payload: Revoke) -> Self {
-        Self::Revoke(payload)
+    pub fn revoke(payload: ChannelRevocation) -> Self {
+        Self::Revoke(Revoke::new(payload))
     }
-    pub fn deny(payload: Deny) -> Self {
-        Self::Deny(payload)
+    pub fn deny(payload: AdjudicationDenial) -> Self {
+        Self::Deny(Deny::new(payload))
     }
 }
 
 #[rustfmt::skip]
 impl Output {
-    pub fn channel_granted(payload: ChannelGranted) -> Self {
-        Self::ChannelGranted(payload)
+    pub fn channel_granted(payload: GrantedChannel) -> Self {
+        Self::ChannelGranted(ChannelGranted::new(payload))
     }
-    pub fn channel_extended(payload: ChannelExtended) -> Self {
-        Self::ChannelExtended(payload)
+    pub fn channel_extended(payload: ExtendedChannel) -> Self {
+        Self::ChannelExtended(ChannelExtended::new(payload))
     }
-    pub fn channel_revoked(payload: ChannelRevoked) -> Self {
-        Self::ChannelRevoked(payload)
+    pub fn channel_revoked(payload: RevokedChannel) -> Self {
+        Self::ChannelRevoked(ChannelRevoked::new(payload))
     }
-    pub fn adjudication_denied(payload: AdjudicationDenied) -> Self {
-        Self::AdjudicationDenied(payload)
+    pub fn adjudication_denied(payload: DeniedAdjudication) -> Self {
+        Self::AdjudicationDenied(AdjudicationDenied::new(payload))
     }
-    pub fn channel_order_rejected(payload: ChannelOrderRejected) -> Self {
-        Self::ChannelOrderRejected(payload)
+    pub fn channel_order_rejected(payload: RejectedChannelOrder) -> Self {
+        Self::ChannelOrderRejected(ChannelOrderRejected::new(payload))
     }
-    pub fn request_unimplemented(payload: RequestUnimplemented) -> Self {
-        Self::RequestUnimplemented(payload)
+    pub fn request_unimplemented(payload: UnimplementedRequest) -> Self {
+        Self::RequestUnimplemented(RequestUnimplemented::new(payload))
+    }
+}
+
+#[rustfmt::skip]
+impl From<UnixUserIdentifier> for ConnectionClass {
+    fn from(payload: UnixUserIdentifier) -> Self {
+        Self::NonOwnerUser(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<SystemPrincipal> for ConnectionClass {
+    fn from(payload: SystemPrincipal) -> Self {
+        Self::System(payload)
     }
 }
 
@@ -457,6 +870,13 @@ impl Output {
 impl From<OtherPersonaEngine> for ConnectionClass {
     fn from(payload: OtherPersonaEngine) -> Self {
         Self::OtherPersona(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<NetworkPeer> for ConnectionClass {
+    fn from(payload: NetworkPeer) -> Self {
+        Self::Network(payload)
     }
 }
 
@@ -475,6 +895,237 @@ impl From<ConnectionClass> for ChannelEndpoint {
 }
 
 #[rustfmt::skip]
+impl From<TimestampNanoseconds> for ChannelDuration {
+    fn from(payload: TimestampNanoseconds) -> Self {
+        Self::TimeBound(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Grant> for Input {
+    fn from(payload: Grant) -> Self {
+        Self::Grant(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Extend> for Input {
+    fn from(payload: Extend) -> Self {
+        Self::Extend(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Revoke> for Input {
+    fn from(payload: Revoke) -> Self {
+        Self::Revoke(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<Deny> for Input {
+    fn from(payload: Deny) -> Self {
+        Self::Deny(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<ChannelGranted> for Output {
+    fn from(payload: ChannelGranted) -> Self {
+        Self::ChannelGranted(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<ChannelExtended> for Output {
+    fn from(payload: ChannelExtended) -> Self {
+        Self::ChannelExtended(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<ChannelRevoked> for Output {
+    fn from(payload: ChannelRevoked) -> Self {
+        Self::ChannelRevoked(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<AdjudicationDenied> for Output {
+    fn from(payload: AdjudicationDenied) -> Self {
+        Self::AdjudicationDenied(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<ChannelOrderRejected> for Output {
+    fn from(payload: ChannelOrderRejected) -> Self {
+        Self::ChannelOrderRejected(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl From<RequestUnimplemented> for Output {
+    fn from(payload: RequestUnimplemented) -> Self {
+        Self::RequestUnimplemented(payload)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Grant {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Extend {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Revoke {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl Deny {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ChannelGranted {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ChannelExtended {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ChannelRevoked {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl AdjudicationDenied {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ChannelOrderRejected {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl RequestUnimplemented {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl ChannelIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl AdjudicationRequestIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl TextBody {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl TimestampNanoseconds {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
 #[cfg(feature = "nota-text")]
 impl ComponentName {
     pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
@@ -482,6 +1133,61 @@ impl ComponentName {
     }
     pub fn to_nota(self) -> String {
         <Self as NotaEncode>::to_nota(&self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl UnixUserIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl SystemPrincipal {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl EngineIdentifier {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl HostName {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
+    }
+}
+
+#[rustfmt::skip]
+#[cfg(feature = "nota-text")]
+impl NetworkPeer {
+    pub fn from_nota_block(block: &nota_next::Block) -> Result<Self, NotaDecodeError> {
+        <Self as NotaDecode>::from_nota_block(block)
+    }
+    pub fn to_nota(&self) -> String {
+        <Self as NotaEncode>::to_nota(self)
     }
 }
 

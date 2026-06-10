@@ -33,36 +33,53 @@ fn grant() -> ChannelGrant {
 
 fn inputs() -> Vec<Input> {
     vec![
-        Input::Grant(grant()),
-        Input::Extend(ChannelExtension {
-            channel: "channel-aab".to_owned(),
-            duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000),
-        }),
-        Input::Revoke(ChannelRevocation {
-            channel: "channel-aab".to_owned(),
-            reason: "operator closed the path".to_owned(),
-        }),
-        Input::Deny(AdjudicationDenial {
-            request: "adjudication-aab".to_owned(),
-            reason: "destination unavailable".to_owned(),
-        }),
+        Input::Grant(grant().into()),
+        Input::Extend(
+            ChannelExtension {
+                channel: "channel-aab".to_owned().into(),
+                duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
+            }
+            .into(),
+        ),
+        Input::Revoke(
+            ChannelRevocation {
+                channel: "channel-aab".to_owned().into(),
+                reason: "operator closed the path".to_owned().into(),
+            }
+            .into(),
+        ),
+        Input::Deny(
+            AdjudicationDenial {
+                request: "adjudication-aab".to_owned().into(),
+                reason: "destination unavailable".to_owned().into(),
+            }
+            .into(),
+        ),
     ]
 }
 
 fn outputs() -> Vec<Output> {
     vec![
-        Output::ChannelGranted(GrantedChannel("channel-aab".to_owned())),
-        Output::ChannelExtended(ExtendedChannel("channel-aab".to_owned())),
-        Output::ChannelRevoked(RevokedChannel("channel-aab".to_owned())),
-        Output::AdjudicationDenied(DeniedAdjudication("adjudication-aab".to_owned())),
-        Output::ChannelOrderRejected(RejectedChannelOrder {
-            operation: OperationKind::Grant,
-            reason: ChannelOrderRejectionReason::PolicyRefused,
-        }),
-        Output::RequestUnimplemented(UnimplementedRequest {
-            operation: OperationKind::Grant,
-            reason: UnimplementedReason::NotBuiltYet,
-        }),
+        Output::ChannelGranted(GrantedChannel::new("channel-aab".to_owned().into()).into()),
+        Output::ChannelExtended(ExtendedChannel::new("channel-aab".to_owned().into()).into()),
+        Output::ChannelRevoked(RevokedChannel::new("channel-aab".to_owned().into()).into()),
+        Output::AdjudicationDenied(
+            DeniedAdjudication::new("adjudication-aab".to_owned().into()).into(),
+        ),
+        Output::ChannelOrderRejected(
+            RejectedChannelOrder {
+                operation: OperationKind::Grant,
+                reason: ChannelOrderRejectionReason::PolicyRefused,
+            }
+            .into(),
+        ),
+        Output::RequestUnimplemented(
+            UnimplementedRequest {
+                operation: OperationKind::Grant,
+                reason: UnimplementedReason::NotBuiltYet,
+            }
+            .into(),
+        ),
     ]
 }
 
@@ -161,13 +178,13 @@ fn output_replies_round_trip_through_nota_text() {
 #[cfg(feature = "nota-text")]
 #[test]
 fn grant_operation_encodes_as_contract_local_nota_head() {
-    let text = Input::Grant(grant()).to_nota();
+    let text = Input::Grant(grant().into()).to_nota();
     assert!(
         text.starts_with("(Grant"),
         "expected Grant head, got {text}"
     );
     let recovered: Input = text.parse().expect("parse grant nota");
-    assert_eq!(recovered, Input::Grant(grant()));
+    assert_eq!(recovered, Input::Grant(grant().into()));
 }
 
 #[cfg(feature = "nota-text")]

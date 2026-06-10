@@ -33,7 +33,16 @@
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
         src = pkgs.lib.cleanSourceWith {
           src = ./.;
-          filter = craneLib.filterCargoSources;
+          filter =
+            path: type:
+            let
+              pathString = toString path;
+              schemaRoot = "${toString ./.}/schema";
+            in
+            type == "directory"
+            || craneLib.filterCargoSources path type
+            || pathString == schemaRoot
+            || pkgs.lib.hasPrefix "${schemaRoot}/" pathString;
           name = "source";
         };
         commonArgs = {
@@ -81,4 +90,3 @@
       }
     );
 }
-
