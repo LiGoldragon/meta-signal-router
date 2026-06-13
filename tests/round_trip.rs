@@ -14,9 +14,9 @@
 use meta_signal_router::{
     AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
     ChannelMessageKind, ChannelOrderRejectionReason, ChannelRevocation, ComponentName,
-    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, OperationKind,
-    Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason, UnimplementedRequest,
-    short_header,
+    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, NotaEncode,
+    OperationKind, Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason,
+    UnimplementedRequest, short_header,
 };
 
 fn grant() -> ChannelGrant {
