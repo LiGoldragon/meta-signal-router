@@ -14,10 +14,12 @@
 use meta_signal_router::{
     AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
     ChannelMessageKind, ChannelOrderRejectionReason, ChannelRevocation, ComponentName,
-    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, NotaEncode,
-    OperationKind, Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason,
-    UnimplementedRequest, short_header,
+    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, OperationKind,
+    Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason, UnimplementedRequest,
+    short_header,
 };
+#[cfg(feature = "nota-text")]
+use nota_next::NotaEncode;
 
 fn grant() -> ChannelGrant {
     ChannelGrant {
