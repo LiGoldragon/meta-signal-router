@@ -115,7 +115,7 @@
   ChannelGrant {
     source ChannelEndpoint
     destination ChannelEndpoint
-    kinds (Vec ChannelMessageKind)
+    kinds (Vector ChannelMessageKind)
     duration ChannelDuration
   }
 
