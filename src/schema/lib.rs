@@ -81,7 +81,7 @@ pub struct TextBody(String);
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct TimestampNanoseconds(u64);
+pub struct TimestampNanoseconds(Integer);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -110,7 +110,7 @@ pub enum ComponentName {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct UnixUserIdentifier(u64);
+pub struct UnixUserIdentifier(Integer);
 
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
@@ -198,10 +198,15 @@ pub enum ChannelDuration {
 #[rustfmt::skip]
 #[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub(crate) struct Kinds(Vec<ChannelMessageKind>);
+
+#[rustfmt::skip]
+#[cfg_attr(feature = "nota-text", derive(nota_next::NotaDecode, nota_next::NotaEncode))]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelGrant {
     pub source: ChannelEndpoint,
     pub destination: ChannelEndpoint,
-    pub kinds: Vec<ChannelMessageKind>,
+    pub(crate) kinds: Kinds,
     pub duration: ChannelDuration,
 }
 
@@ -647,39 +652,75 @@ impl PartialEq<&str> for TextBody {
 
 #[rustfmt::skip]
 impl TimestampNanoseconds {
-    pub fn new(payload: u64) -> Self {
+    pub fn new(payload: Integer) -> Self {
         Self(payload)
     }
-    pub fn payload(&self) -> &u64 {
+    pub fn payload(&self) -> &Integer {
         &self.0
     }
-    pub fn into_payload(self) -> u64 {
+    pub fn into_payload(self) -> Integer {
         self.0
     }
 }
 #[rustfmt::skip]
-impl From<u64> for TimestampNanoseconds {
-    fn from(payload: u64) -> Self {
+impl From<Integer> for TimestampNanoseconds {
+    fn from(payload: Integer) -> Self {
         Self::new(payload)
+    }
+}
+#[rustfmt::skip]
+impl std::fmt::Display for TimestampNanoseconds {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.payload().fmt(formatter)
+    }
+}
+#[rustfmt::skip]
+impl PartialEq<u64> for TimestampNanoseconds {
+    fn eq(&self, other: &u64) -> bool {
+        self.payload() == other
+    }
+}
+#[rustfmt::skip]
+impl PartialOrd<u64> for TimestampNanoseconds {
+    fn partial_cmp(&self, other: &u64) -> Option<std::cmp::Ordering> {
+        self.payload().partial_cmp(other)
     }
 }
 
 #[rustfmt::skip]
 impl UnixUserIdentifier {
-    pub fn new(payload: u64) -> Self {
+    pub fn new(payload: Integer) -> Self {
         Self(payload)
     }
-    pub fn payload(&self) -> &u64 {
+    pub fn payload(&self) -> &Integer {
         &self.0
     }
-    pub fn into_payload(self) -> u64 {
+    pub fn into_payload(self) -> Integer {
         self.0
     }
 }
 #[rustfmt::skip]
-impl From<u64> for UnixUserIdentifier {
-    fn from(payload: u64) -> Self {
+impl From<Integer> for UnixUserIdentifier {
+    fn from(payload: Integer) -> Self {
         Self::new(payload)
+    }
+}
+#[rustfmt::skip]
+impl std::fmt::Display for UnixUserIdentifier {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.payload().fmt(formatter)
+    }
+}
+#[rustfmt::skip]
+impl PartialEq<u64> for UnixUserIdentifier {
+    fn eq(&self, other: &u64) -> bool {
+        self.payload() == other
+    }
+}
+#[rustfmt::skip]
+impl PartialOrd<u64> for UnixUserIdentifier {
+    fn partial_cmp(&self, other: &u64) -> Option<std::cmp::Ordering> {
+        self.payload().partial_cmp(other)
     }
 }
 
@@ -832,6 +873,25 @@ impl PartialEq<&str> for NetworkPeer {
 }
 
 #[rustfmt::skip]
+impl Kinds {
+    pub fn new(payload: Vec<ChannelMessageKind>) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Vec<ChannelMessageKind> {
+        &self.0
+    }
+    pub fn into_payload(self) -> Vec<ChannelMessageKind> {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Vec<ChannelMessageKind>> for Kinds {
+    fn from(payload: Vec<ChannelMessageKind>) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl GrantedChannel {
     pub fn new(payload: ChannelIdentifier) -> Self {
         Self(payload)
@@ -909,7 +969,7 @@ impl From<AdjudicationRequestIdentifier> for DeniedAdjudication {
 
 #[rustfmt::skip]
 impl ConnectionClass {
-    pub fn non_owner_user(payload: u64) -> Self {
+    pub fn non_owner_user(payload: Integer) -> Self {
         Self::NonOwnerUser(UnixUserIdentifier::new(payload))
     }
     pub fn system(payload: String) -> Self {
@@ -935,7 +995,7 @@ impl ChannelEndpoint {
 
 #[rustfmt::skip]
 impl ChannelDuration {
-    pub fn time_bound(payload: u64) -> Self {
+    pub fn time_bound(payload: Integer) -> Self {
         Self::TimeBound(TimestampNanoseconds::new(payload))
     }
 }

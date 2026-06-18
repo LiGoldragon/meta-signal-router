@@ -22,15 +22,15 @@ use meta_signal_router::{
 use nota_next::NotaEncode;
 
 fn grant() -> ChannelGrant {
-    ChannelGrant {
-        source: ChannelEndpoint::External(ConnectionClass::Owner),
-        destination: ChannelEndpoint::Internal(ComponentName::Router),
-        kinds: vec![
+    ChannelGrant::new(
+        ChannelEndpoint::External(ConnectionClass::Owner),
+        ChannelEndpoint::Internal(ComponentName::Router),
+        vec![
             ChannelMessageKind::MessageSubmission,
             ChannelMessageKind::InboxQuery,
         ],
-        duration: ChannelDuration::Permanent,
-    }
+        ChannelDuration::Permanent,
+    )
 }
 
 fn inputs() -> Vec<Input> {

@@ -66,7 +66,7 @@
   TextBody String
 
   ;; A wall-clock instant in nanoseconds, used by a time-bound grant.
-  TimestampNanoseconds u64
+  TimestampNanoseconds Integer
 
   ;; A supervised component instance inside the local Persona engine,
   ;; mirrored from signal-persona-origin's ComponentName.
@@ -76,12 +76,12 @@
   ;; system boundary, mirrored from signal-persona-origin's ConnectionClass.
   ;; The Unix uid is carried as u64 — the NOTA text codec implements its
   ;; integer trait for u64 only, and a uid fits without loss.
-  UnixUserIdentifier u64
+  UnixUserIdentifier Integer
   SystemPrincipal String
   EngineIdentifier String
   HostName String
   NetworkPeer String
-  OtherPersonaEngine { engine_identifier EngineIdentifier host HostName }
+  OtherPersonaEngine { EngineIdentifier host.HostName }
   ConnectionClass [Owner (NonOwnerUser UnixUserIdentifier) (System SystemPrincipal) (OtherPersona OtherPersonaEngine) (Network NetworkPeer)]
 
   ;; A channel endpoint is either an internal component or an external
@@ -113,36 +113,36 @@
   ;; Grant payload — the source/destination endpoints, the covered route
   ;; categories, and the requested duration.
   ChannelGrant {
-    source ChannelEndpoint
-    destination ChannelEndpoint
-    kinds (Vector ChannelMessageKind)
-    duration ChannelDuration
+    source.ChannelEndpoint
+    destination.ChannelEndpoint
+    (Kinds (Vector ChannelMessageKind))
+    duration.ChannelDuration
   }
 
   ;; Extend payload — change the duration of an existing live channel.
-  ChannelExtension { channel ChannelIdentifier duration ChannelDuration }
+  ChannelExtension { channel.ChannelIdentifier duration.ChannelDuration }
 
   ;; Revoke payload — remove a live channel, with a reason for the record.
-  ChannelRevocation { channel ChannelIdentifier reason TextBody }
+  ChannelRevocation { channel.ChannelIdentifier reason.TextBody }
 
   ;; Deny payload — close an adjudication request without a grant.
-  AdjudicationDenial { request AdjudicationRequestIdentifier reason TextBody }
+  AdjudicationDenial { request.AdjudicationRequestIdentifier reason.TextBody }
 
   ;; Reply payloads.
-  GrantedChannel { channel ChannelIdentifier }
-  ExtendedChannel { channel ChannelIdentifier }
-  RevokedChannel { channel ChannelIdentifier }
-  DeniedAdjudication { request AdjudicationRequestIdentifier }
+  GrantedChannel ChannelIdentifier
+  ExtendedChannel ChannelIdentifier
+  RevokedChannel ChannelIdentifier
+  DeniedAdjudication AdjudicationRequestIdentifier
 
   ;; Which operation a rejection or unimplemented reply refers back to.
   OperationKind [Grant Extend Revoke Deny]
 
   ;; The order was understood but rejected by router policy.
   ChannelOrderRejectionReason [MetaAuthorityRequired ChannelAlreadyExists ChannelMissing AdjudicationRequestMissing PolicyRefused]
-  RejectedChannelOrder { operation OperationKind reason ChannelOrderRejectionReason }
+  RejectedChannelOrder { operation.OperationKind reason.ChannelOrderRejectionReason }
 
   ;; The request is in the contract but not implemented by the current
   ;; runtime.
   UnimplementedReason [NotBuiltYet DependencyNotReady PolicyStoreUnavailable]
-  UnimplementedRequest { operation OperationKind reason UnimplementedReason }
+  UnimplementedRequest { operation.OperationKind reason.UnimplementedReason }
 }

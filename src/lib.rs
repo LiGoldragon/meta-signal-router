@@ -14,6 +14,27 @@
 //! envelope are all emitted from `schema/lib.schema` by `schema-rust-next`;
 //! the checked-in artifacts live in `src/schema/`.
 
+#[allow(dead_code, private_interfaces)]
 pub mod schema;
 
 pub use schema::lib::*;
+
+impl ChannelGrant {
+    pub fn new(
+        source: ChannelEndpoint,
+        destination: ChannelEndpoint,
+        kinds: Vec<ChannelMessageKind>,
+        duration: ChannelDuration,
+    ) -> Self {
+        Self {
+            source,
+            destination,
+            kinds: Kinds::new(kinds),
+            duration,
+        }
+    }
+
+    pub fn kinds(&self) -> &[ChannelMessageKind] {
+        self.kinds.payload().as_slice()
+    }
+}
