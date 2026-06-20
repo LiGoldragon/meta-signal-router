@@ -557,24 +557,6 @@ impl From<String> for ChannelIdentifier {
         Self::new(payload)
     }
 }
-#[rustfmt::skip]
-impl std::fmt::Display for ChannelIdentifier {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for ChannelIdentifier {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for ChannelIdentifier {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
-    }
-}
 
 #[rustfmt::skip]
 impl AdjudicationRequestIdentifier {
@@ -592,24 +574,6 @@ impl AdjudicationRequestIdentifier {
 impl From<String> for AdjudicationRequestIdentifier {
     fn from(payload: String) -> Self {
         Self::new(payload)
-    }
-}
-#[rustfmt::skip]
-impl std::fmt::Display for AdjudicationRequestIdentifier {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for AdjudicationRequestIdentifier {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for AdjudicationRequestIdentifier {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
     }
 }
 
@@ -631,24 +595,6 @@ impl From<String> for TextBody {
         Self::new(payload)
     }
 }
-#[rustfmt::skip]
-impl std::fmt::Display for TextBody {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for TextBody {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for TextBody {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
-    }
-}
 
 #[rustfmt::skip]
 impl TimestampNanoseconds {
@@ -666,24 +612,6 @@ impl TimestampNanoseconds {
 impl From<Integer> for TimestampNanoseconds {
     fn from(payload: Integer) -> Self {
         Self::new(payload)
-    }
-}
-#[rustfmt::skip]
-impl std::fmt::Display for TimestampNanoseconds {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<u64> for TimestampNanoseconds {
-    fn eq(&self, other: &u64) -> bool {
-        self.payload() == other
-    }
-}
-#[rustfmt::skip]
-impl PartialOrd<u64> for TimestampNanoseconds {
-    fn partial_cmp(&self, other: &u64) -> Option<std::cmp::Ordering> {
-        self.payload().partial_cmp(other)
     }
 }
 
@@ -705,24 +633,6 @@ impl From<Integer> for UnixUserIdentifier {
         Self::new(payload)
     }
 }
-#[rustfmt::skip]
-impl std::fmt::Display for UnixUserIdentifier {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<u64> for UnixUserIdentifier {
-    fn eq(&self, other: &u64) -> bool {
-        self.payload() == other
-    }
-}
-#[rustfmt::skip]
-impl PartialOrd<u64> for UnixUserIdentifier {
-    fn partial_cmp(&self, other: &u64) -> Option<std::cmp::Ordering> {
-        self.payload().partial_cmp(other)
-    }
-}
 
 #[rustfmt::skip]
 impl SystemPrincipal {
@@ -740,24 +650,6 @@ impl SystemPrincipal {
 impl From<String> for SystemPrincipal {
     fn from(payload: String) -> Self {
         Self::new(payload)
-    }
-}
-#[rustfmt::skip]
-impl std::fmt::Display for SystemPrincipal {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for SystemPrincipal {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for SystemPrincipal {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
     }
 }
 
@@ -779,24 +671,6 @@ impl From<String> for EngineIdentifier {
         Self::new(payload)
     }
 }
-#[rustfmt::skip]
-impl std::fmt::Display for EngineIdentifier {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for EngineIdentifier {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for EngineIdentifier {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
-    }
-}
 
 #[rustfmt::skip]
 impl HostName {
@@ -816,24 +690,6 @@ impl From<String> for HostName {
         Self::new(payload)
     }
 }
-#[rustfmt::skip]
-impl std::fmt::Display for HostName {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for HostName {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for HostName {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
-    }
-}
 
 #[rustfmt::skip]
 impl NetworkPeer {
@@ -851,24 +707,6 @@ impl NetworkPeer {
 impl From<String> for NetworkPeer {
     fn from(payload: String) -> Self {
         Self::new(payload)
-    }
-}
-#[rustfmt::skip]
-impl std::fmt::Display for NetworkPeer {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.payload().fmt(formatter)
-    }
-}
-#[rustfmt::skip]
-impl AsRef<str> for NetworkPeer {
-    fn as_ref(&self) -> &str {
-        self.payload().as_str()
-    }
-}
-#[rustfmt::skip]
-impl PartialEq<&str> for NetworkPeer {
-    fn eq(&self, other: &&str) -> bool {
-        self.payload() == other
     }
 }
 
