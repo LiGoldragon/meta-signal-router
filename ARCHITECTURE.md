@@ -76,7 +76,7 @@ This repo owns:
 - meta-signal replies and rejection reasons;
 - rkyv and NOTA round-trip shape for the policy signal;
 - the contract-local `OperationKind` witness and the `short_header`
-  constants, emitted from `schema/lib.schema` by `schema-rust-next`.
+  constants, emitted from `schema/lib.schema` by `schema-rust`.
 
 This repo does not own:
 
@@ -112,7 +112,7 @@ This repo does not own:
 
 This crate is a real emitting wire contract, not a hand-written
 mirror. `schema/lib.schema` is the single source of truth; `build.rs`
-runs `schema-rust-next`'s `GenerationPlan::wire_contract` driver, which
+runs `schema-rust`'s `GenerationPlan::wire_contract` driver, which
 emits the `Input`/`Output` enums, the policy payload records and reply
 types, the NOTA codec (gated behind the `nota-text` feature), the
 route witnesses, the `short_header` constants, and the
@@ -146,7 +146,7 @@ listener.
 
 ```text
 schema/lib.schema     the meta channel-policy wire-contract schema (source of truth)
-build.rs              schema-rust-next wire_contract generation driver
+build.rs              schema-rust wire_contract generation driver
 src/lib.rs            re-exports the generated schema module
 src/schema/lib.rs     checked-in generated artifact (do not hand-edit)
 tests/round_trip.rs   rkyv + NOTA round trips and contract-local witnesses

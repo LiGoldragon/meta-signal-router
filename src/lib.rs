@@ -11,7 +11,7 @@
 //!
 //! The wire types, the `Input`/`Output` enums, the route witnesses, the
 //! short headers, and the `encode_signal_frame`/`decode_signal_frame` mail
-//! envelope are all emitted from `schema/lib.schema` by `schema-rust-next`;
+//! envelope are all emitted from `schema/lib.schema` by `schema-rust`;
 //! the checked-in artifacts live in `src/schema/`.
 
 #[allow(dead_code, private_interfaces)]

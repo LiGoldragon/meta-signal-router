@@ -5,7 +5,7 @@
 //! to its contract-local short header, and that meta-order names never
 //! appear in the routed-message-kind vocabulary.
 //!
-//! The current refreshed schema-rust-next base emits, for a pure
+//! The current refreshed schema-rust base emits, for a pure
 //! `wire_contract()` target, the wire types + NOTA codec + route
 //! witnesses + the `short_header` constant module + signal-frame helpers.
 //! The daemon wraps those contract frames in the triad-runtime
@@ -19,7 +19,7 @@ use meta_signal_router::{
     short_header,
 };
 #[cfg(feature = "nota-text")]
-use nota_next::NotaEncode;
+use nota::NotaEncode;
 
 fn grant() -> ChannelGrant {
     ChannelGrant::new(

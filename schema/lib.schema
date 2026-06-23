@@ -115,7 +115,7 @@
   ChannelGrant {
     source.ChannelEndpoint
     destination.ChannelEndpoint
-    (Kinds (Vector ChannelMessageKind))
+    Kinds.(Vector ChannelMessageKind)
     duration.ChannelDuration
   }
 
