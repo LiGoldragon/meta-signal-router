@@ -11,7 +11,7 @@ Before editing, read:
 - this repo's `ARCHITECTURE.md`
 - `../signal-router/ARCHITECTURE.md`
 - `../router/ARCHITECTURE.md`
-- `../signal-persona-mind/ARCHITECTURE.md`
+- `../signal-mind/ARCHITECTURE.md`
 
 This repo owns only the meta-signal PersonaRouter channel-policy
 signal vocabulary. It contains no daemon, no database tables, no
