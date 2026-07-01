@@ -2,6 +2,10 @@
 
 *Meta-signal Signal contract for PersonaRouter channel policy.*
 
+## 0.5 · Direction
+
+`meta-signal-router` is the meta policy contract for PersonaRouter channel authority. The caller is `orchestrate`: Mind decides whether channel policy should change, orders Orchestrate through `meta-signal-orchestrate`, and Orchestrate enacts that decision here. The intended caller is Orchestrate, not Mind; Mind reaches Router channel policy by ordering Orchestrate first. Channel-authority orders live only in this meta-signal contract; ordinary router observation traffic stays in `signal-router`.
+
 ## 0 · TL;DR
 
 `meta-signal-router` is the policy signal for
