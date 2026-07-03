@@ -23,13 +23,22 @@
 ;; to cross-imports via the signal-persona-origin:lib:TypeName form
 ;; (precedent: meta-signal-lojix cross-importing signal-lojix:lib types).
 ;;
-;; OPERATION VOCABULARY. The four meta operations mirror the established
-;; router channel-authority surface exactly — no new operation is invented:
+;; OPERATION VOCABULARY. The four channel-authority meta operations mirror
+;; the established router channel-authority surface exactly:
 ;;   Grant   apply meta authority by creating or replacing a live grant;
 ;;   Extend  change the duration of a live channel grant;
 ;;   Revoke  remove a live channel grant;
 ;;   Deny    record a meta-policy decision that an adjudication request will
 ;;           not receive a grant.
+;; A fifth operation gates the router's mirror path (primary-nbmq.7, piece 6
+;; of the persistent Spirit-mirror design):
+;;   SetMirrorEnabled  flip the router's single, owner-only, persisted
+;;                     mirror switch. Default OFF; the value survives a
+;;                     router restart. While OFF the router neither
+;;                     originates nor accepts mirror (routed-object)
+;;                     forwards — the router is the single network
+;;                     chokepoint, so this one gate is authoritative
+;;                     regardless of Spirit/Criome state.
 ;; The wire carries contract-local operation roots only — there is no
 ;; public Mutate or Retract wrapper; the Sema class is a daemon-side
 ;; projection.
@@ -39,13 +48,14 @@
 ;; through ordinary channels, so the ChannelMessageKind enum names none of
 ;; them.
 
-[Grant Extend Revoke Deny]
-[ChannelGranted ChannelExtended ChannelRevoked AdjudicationDenied ChannelOrderRejected RequestUnimplemented]
+[Grant Extend Revoke Deny SetMirrorEnabled]
+[ChannelGranted ChannelExtended ChannelRevoked AdjudicationDenied ChannelOrderRejected RequestUnimplemented MirrorEnabledSet]
 {
   Grant ChannelGrant
   Extend ChannelExtension
   Revoke ChannelRevocation
   Deny AdjudicationDenial
+  SetMirrorEnabled MirrorEnabled
 
   ChannelGranted GrantedChannel
   ChannelExtended ExtendedChannel
@@ -53,6 +63,7 @@
   AdjudicationDenied DeniedAdjudication
   ChannelOrderRejected RejectedChannelOrder
   RequestUnimplemented UnimplementedRequest
+  MirrorEnabledSet MirrorEnabled
 
   ;; The identifier a live channel is known by. Daemon-minted on Grant and
   ;; carried back in the GrantedChannel reply; callers reference an existing
@@ -67,6 +78,12 @@
 
   ;; A wall-clock instant in nanoseconds, used by a time-bound grant.
   TimestampNanoseconds Integer
+
+  ;; Whether the router's mirror path is switched on. Carried both as the
+  ;; requested value on SetMirrorEnabled and as the confirmed value on
+  ;; MirrorEnabledSet — the toggle always applies (owner-only, no policy
+  ;; check), so the reply simply echoes what is now in effect.
+  MirrorEnabled Boolean
 
   ;; A supervised component instance inside the local Persona engine,
   ;; mirrored from signal-persona-origin's ComponentName.
