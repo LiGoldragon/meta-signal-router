@@ -14,9 +14,9 @@
 use meta_signal_router::{
     AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
     ChannelMessageKind, ChannelOrderRejectionReason, ChannelRevocation, ComponentName,
-    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, OperationKind,
-    Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason, UnimplementedRequest,
-    short_header,
+    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, MirrorEnabled,
+    OperationKind, Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason,
+    UnimplementedRequest, short_header,
 };
 #[cfg(feature = "nota-text")]
 use nota::NotaEncode;
@@ -57,6 +57,7 @@ fn inputs() -> Vec<Input> {
             }
             .into(),
         ),
+        Input::set_mirror_enabled(MirrorEnabled::new(true)),
     ]
 }
 
@@ -82,6 +83,7 @@ fn outputs() -> Vec<Output> {
             }
             .into(),
         ),
+        Output::mirror_enabled_set(MirrorEnabled::new(true)),
     ]
 }
 
@@ -138,12 +140,14 @@ fn short_headers_are_contract_local_and_distinct() {
         short_header::INPUT_EXTEND,
         short_header::INPUT_REVOKE,
         short_header::INPUT_DENY,
+        short_header::INPUT_SET_MIRROR_ENABLED,
         short_header::OUTPUT_CHANNEL_GRANTED,
         short_header::OUTPUT_CHANNEL_EXTENDED,
         short_header::OUTPUT_CHANNEL_REVOKED,
         short_header::OUTPUT_ADJUDICATION_DENIED,
         short_header::OUTPUT_CHANNEL_ORDER_REJECTED,
         short_header::OUTPUT_REQUEST_UNIMPLEMENTED,
+        short_header::OUTPUT_MIRROR_ENABLED_SET,
     ];
     for (outer_index, outer) in headers.iter().enumerate() {
         for (inner_index, inner) in headers.iter().enumerate() {

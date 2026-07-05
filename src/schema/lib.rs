@@ -51,6 +51,14 @@ pub struct Deny(AdjudicationDenial);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetMirrorEnabled(MirrorEnabled);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelGranted(GrantedChannel);
 
 #[rustfmt::skip]
@@ -99,6 +107,14 @@ pub struct RequestUnimplemented(UnimplementedRequest);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct MirrorEnabledSet(MirrorEnabled);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelIdentifier(String);
 
 #[rustfmt::skip]
@@ -124,6 +140,14 @@ pub struct TextBody(String);
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TimestampNanoseconds(Integer);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct MirrorEnabled(Boolean);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -455,6 +479,7 @@ pub enum Input {
     Extend(Extend),
     Revoke(Revoke),
     Deny(Deny),
+    SetMirrorEnabled(SetMirrorEnabled),
 }
 
 #[rustfmt::skip]
@@ -470,6 +495,7 @@ pub enum Output {
     AdjudicationDenied(AdjudicationDenied),
     ChannelOrderRejected(ChannelOrderRejected),
     RequestUnimplemented(RequestUnimplemented),
+    MirrorEnabledSet(MirrorEnabledSet),
 }
 
 #[rustfmt::skip]
@@ -544,6 +570,25 @@ impl Deny {
 #[rustfmt::skip]
 impl From<AdjudicationDenial> for Deny {
     fn from(payload: AdjudicationDenial) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl SetMirrorEnabled {
+    pub fn new(payload: MirrorEnabled) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &MirrorEnabled {
+        &self.0
+    }
+    pub fn into_payload(self) -> MirrorEnabled {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<MirrorEnabled> for SetMirrorEnabled {
+    fn from(payload: MirrorEnabled) -> Self {
         Self::new(payload)
     }
 }
@@ -663,6 +708,25 @@ impl From<UnimplementedRequest> for RequestUnimplemented {
 }
 
 #[rustfmt::skip]
+impl MirrorEnabledSet {
+    pub fn new(payload: MirrorEnabled) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &MirrorEnabled {
+        &self.0
+    }
+    pub fn into_payload(self) -> MirrorEnabled {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<MirrorEnabled> for MirrorEnabledSet {
+    fn from(payload: MirrorEnabled) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl ChannelIdentifier {
     pub fn new(payload: impl Into<String>) -> Self {
         Self(payload.into())
@@ -734,6 +798,25 @@ impl TimestampNanoseconds {
 #[rustfmt::skip]
 impl From<Integer> for TimestampNanoseconds {
     fn from(payload: Integer) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl MirrorEnabled {
+    pub fn new(payload: Boolean) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &Boolean {
+        &self.0
+    }
+    pub fn into_payload(self) -> Boolean {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<Boolean> for MirrorEnabled {
+    fn from(payload: Boolean) -> Self {
         Self::new(payload)
     }
 }
@@ -975,6 +1058,9 @@ impl Input {
     pub fn deny(payload: AdjudicationDenial) -> Self {
         Self::Deny(Deny::new(payload))
     }
+    pub fn set_mirror_enabled(payload: MirrorEnabled) -> Self {
+        Self::SetMirrorEnabled(SetMirrorEnabled::new(payload))
+    }
 }
 
 #[rustfmt::skip]
@@ -996,6 +1082,9 @@ impl Output {
     }
     pub fn request_unimplemented(payload: UnimplementedRequest) -> Self {
         Self::RequestUnimplemented(RequestUnimplemented::new(payload))
+    }
+    pub fn mirror_enabled_set(payload: MirrorEnabled) -> Self {
+        Self::MirrorEnabledSet(MirrorEnabledSet::new(payload))
     }
 }
 
@@ -1077,6 +1166,13 @@ impl From<Deny> for Input {
 }
 
 #[rustfmt::skip]
+impl From<SetMirrorEnabled> for Input {
+    fn from(payload: SetMirrorEnabled) -> Self {
+        Self::SetMirrorEnabled(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl From<ChannelGranted> for Output {
     fn from(payload: ChannelGranted) -> Self {
         Self::ChannelGranted(payload)
@@ -1119,6 +1215,13 @@ impl From<RequestUnimplemented> for Output {
 }
 
 #[rustfmt::skip]
+impl From<MirrorEnabledSet> for Output {
+    fn from(payload: MirrorEnabledSet) -> Self {
+        Self::MirrorEnabledSet(payload)
+    }
+}
+
+#[rustfmt::skip]
 #[cfg(feature = "nota-text")]
 impl std::str::FromStr for Input {
     type Err = NotaDecodeError;
@@ -1156,12 +1259,14 @@ pub mod short_header {
     pub const INPUT_EXTEND: u64 = 0x0001000000000000;
     pub const INPUT_REVOKE: u64 = 0x0002000000000000;
     pub const INPUT_DENY: u64 = 0x0003000000000000;
+    pub const INPUT_SET_MIRROR_ENABLED: u64 = 0x0004000000000000;
     pub const OUTPUT_CHANNEL_GRANTED: u64 = 0x0100000000000000;
     pub const OUTPUT_CHANNEL_EXTENDED: u64 = 0x0101000000000000;
     pub const OUTPUT_CHANNEL_REVOKED: u64 = 0x0102000000000000;
     pub const OUTPUT_ADJUDICATION_DENIED: u64 = 0x0103000000000000;
     pub const OUTPUT_CHANNEL_ORDER_REJECTED: u64 = 0x0104000000000000;
     pub const OUTPUT_REQUEST_UNIMPLEMENTED: u64 = 0x0105000000000000;
+    pub const OUTPUT_MIRROR_ENABLED_SET: u64 = 0x0106000000000000;
 }
 
 #[rustfmt::skip]
@@ -1219,6 +1324,7 @@ pub enum InputRoute {
     Extend,
     Revoke,
     Deny,
+    SetMirrorEnabled,
 }
 
 #[rustfmt::skip]
@@ -1243,6 +1349,7 @@ pub enum OutputRoute {
     AdjudicationDenied,
     ChannelOrderRejected,
     RequestUnimplemented,
+    MirrorEnabledSet,
 }
 
 #[rustfmt::skip]
@@ -1253,6 +1360,7 @@ impl Input {
             Self::Extend(_) => InputRoute::Extend,
             Self::Revoke(_) => InputRoute::Revoke,
             Self::Deny(_) => InputRoute::Deny,
+            Self::SetMirrorEnabled(_) => InputRoute::SetMirrorEnabled,
         }
     }
     pub fn short_header(&self) -> u64 {
@@ -1261,6 +1369,7 @@ impl Input {
             Self::Extend(_) => short_header::INPUT_EXTEND,
             Self::Revoke(_) => short_header::INPUT_REVOKE,
             Self::Deny(_) => short_header::INPUT_DENY,
+            Self::SetMirrorEnabled(_) => short_header::INPUT_SET_MIRROR_ENABLED,
         }
     }
     pub fn route_from_short_header(header: u64) -> Result<InputRoute, SignalFrameError> {
@@ -1269,6 +1378,7 @@ impl Input {
             short_header::INPUT_EXTEND => Ok(InputRoute::Extend),
             short_header::INPUT_REVOKE => Ok(InputRoute::Revoke),
             short_header::INPUT_DENY => Ok(InputRoute::Deny),
+            short_header::INPUT_SET_MIRROR_ENABLED => Ok(InputRoute::SetMirrorEnabled),
             _ => {
                 Err(SignalFrameError::UnknownHeader {
                     root_enum: "Input",
@@ -1325,6 +1435,7 @@ impl Output {
             Self::AdjudicationDenied(_) => OutputRoute::AdjudicationDenied,
             Self::ChannelOrderRejected(_) => OutputRoute::ChannelOrderRejected,
             Self::RequestUnimplemented(_) => OutputRoute::RequestUnimplemented,
+            Self::MirrorEnabledSet(_) => OutputRoute::MirrorEnabledSet,
         }
     }
     pub fn short_header(&self) -> u64 {
@@ -1335,6 +1446,7 @@ impl Output {
             Self::AdjudicationDenied(_) => short_header::OUTPUT_ADJUDICATION_DENIED,
             Self::ChannelOrderRejected(_) => short_header::OUTPUT_CHANNEL_ORDER_REJECTED,
             Self::RequestUnimplemented(_) => short_header::OUTPUT_REQUEST_UNIMPLEMENTED,
+            Self::MirrorEnabledSet(_) => short_header::OUTPUT_MIRROR_ENABLED_SET,
         }
     }
     pub fn route_from_short_header(
@@ -1353,6 +1465,7 @@ impl Output {
             short_header::OUTPUT_REQUEST_UNIMPLEMENTED => {
                 Ok(OutputRoute::RequestUnimplemented)
             }
+            short_header::OUTPUT_MIRROR_ENABLED_SET => Ok(OutputRoute::MirrorEnabledSet),
             _ => {
                 Err(SignalFrameError::UnknownHeader {
                     root_enum: "Output",
@@ -1403,7 +1516,13 @@ impl Output {
 impl signal_frame::RequestPayload for Input {}
 #[rustfmt::skip]
 impl signal_frame::SignalOperationHeads for Input {
-    const HEADS: &'static [&'static str] = &["Grant", "Extend", "Revoke", "Deny"];
+    const HEADS: &'static [&'static str] = &[
+        "Grant",
+        "Extend",
+        "Revoke",
+        "Deny",
+        "SetMirrorEnabled",
+    ];
 }
 #[rustfmt::skip]
 impl signal_frame::LogVariant for Input {
