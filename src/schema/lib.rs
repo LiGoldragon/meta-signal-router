@@ -10,6 +10,11 @@ pub type Boolean = bool;
 pub type Path = std::string::String;
 
 #[rustfmt::skip]
+pub use signal_router::schema::lib::ChannelIdentifier as ChannelIdentifier;
+#[rustfmt::skip]
+pub use signal_router::schema::lib::TimestampNanos as TimestampNanoseconds;
+
+#[rustfmt::skip]
 #[cfg(feature = "nota-text")]
 pub use nota::{NotaDecodeError, NotaEncode, NotaSource};
 
@@ -115,14 +120,6 @@ pub struct MirrorEnabledSet(MirrorEnabled);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ChannelIdentifier(String);
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AdjudicationRequestIdentifier(String);
 
 #[rustfmt::skip]
@@ -132,14 +129,6 @@ pub struct AdjudicationRequestIdentifier(String);
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TextBody(String);
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct TimestampNanoseconds(Integer);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -222,9 +211,17 @@ pub struct NetworkPeer(String);
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Host(HostName);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct OtherPersonaEngine {
     pub engine_identifier: EngineIdentifier,
-    pub host: HostName,
+    pub host: Host,
 }
 
 #[rustfmt::skip]
@@ -300,7 +297,39 @@ pub enum ChannelDuration {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct Kinds(Vec<ChannelMessageKind>);
+pub struct Kinds(Vec<ChannelMessageKind>);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Duration(ChannelDuration);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Channel(ChannelIdentifier);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Reason(TextBody);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeniedRequest(AdjudicationRequestIdentifier);
 
 #[rustfmt::skip]
 #[cfg_attr(
@@ -311,8 +340,8 @@ pub(crate) struct Kinds(Vec<ChannelMessageKind>);
 pub struct ChannelGrant {
     pub source: ChannelEndpoint,
     pub destination: ChannelEndpoint,
-    pub(crate) kinds: Kinds,
-    pub duration: ChannelDuration,
+    pub kinds: Kinds,
+    pub duration: Duration,
 }
 
 #[rustfmt::skip]
@@ -322,8 +351,8 @@ pub struct ChannelGrant {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelExtension {
-    pub channel: ChannelIdentifier,
-    pub duration: ChannelDuration,
+    pub channel: Channel,
+    pub duration: Duration,
 }
 
 #[rustfmt::skip]
@@ -333,8 +362,8 @@ pub struct ChannelExtension {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelRevocation {
-    pub channel: ChannelIdentifier,
-    pub reason: TextBody,
+    pub channel: Channel,
+    pub reason: Reason,
 }
 
 #[rustfmt::skip]
@@ -344,8 +373,8 @@ pub struct ChannelRevocation {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AdjudicationDenial {
-    pub request: AdjudicationRequestIdentifier,
-    pub reason: TextBody,
+    pub denied_request: DeniedRequest,
+    pub reason: Reason,
 }
 
 #[rustfmt::skip]
@@ -407,6 +436,14 @@ pub enum OperationKind {
     feature = "nota-text",
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct Operation(OperationKind);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
 #[derive(
     rkyv::Archive,
     rkyv::Serialize,
@@ -431,9 +468,17 @@ pub enum ChannelOrderRejectionReason {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct OrderRejectionReason(ChannelOrderRejectionReason);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RejectedChannelOrder {
-    pub operation: OperationKind,
-    pub reason: ChannelOrderRejectionReason,
+    pub operation: Operation,
+    pub order_rejection_reason: OrderRejectionReason,
 }
 
 #[rustfmt::skip]
@@ -463,9 +508,17 @@ pub enum UnimplementedReason {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ImplementationReason(UnimplementedReason);
+
+#[rustfmt::skip]
+#[cfg_attr(
+    feature = "nota-text",
+    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
+)]
+#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct UnimplementedRequest {
-    pub operation: OperationKind,
-    pub reason: UnimplementedReason,
+    pub operation: Operation,
+    pub implementation_reason: ImplementationReason,
 }
 
 #[rustfmt::skip]
@@ -727,25 +780,6 @@ impl From<MirrorEnabled> for MirrorEnabledSet {
 }
 
 #[rustfmt::skip]
-impl ChannelIdentifier {
-    pub fn new(payload: impl Into<String>) -> Self {
-        Self(payload.into())
-    }
-    pub fn payload(&self) -> &String {
-        &self.0
-    }
-    pub fn into_payload(self) -> String {
-        self.0
-    }
-}
-#[rustfmt::skip]
-impl From<String> for ChannelIdentifier {
-    fn from(payload: String) -> Self {
-        Self::new(payload)
-    }
-}
-
-#[rustfmt::skip]
 impl AdjudicationRequestIdentifier {
     pub fn new(payload: impl Into<String>) -> Self {
         Self(payload.into())
@@ -779,25 +813,6 @@ impl TextBody {
 #[rustfmt::skip]
 impl From<String> for TextBody {
     fn from(payload: String) -> Self {
-        Self::new(payload)
-    }
-}
-
-#[rustfmt::skip]
-impl TimestampNanoseconds {
-    pub fn new(payload: Integer) -> Self {
-        Self(payload)
-    }
-    pub fn payload(&self) -> &Integer {
-        &self.0
-    }
-    pub fn into_payload(self) -> Integer {
-        self.0
-    }
-}
-#[rustfmt::skip]
-impl From<Integer> for TimestampNanoseconds {
-    fn from(payload: Integer) -> Self {
         Self::new(payload)
     }
 }
@@ -917,6 +932,25 @@ impl From<String> for NetworkPeer {
 }
 
 #[rustfmt::skip]
+impl Host {
+    pub fn new(payload: HostName) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &HostName {
+        &self.0
+    }
+    pub fn into_payload(self) -> HostName {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<HostName> for Host {
+    fn from(payload: HostName) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl Kinds {
     pub fn new(payload: Vec<ChannelMessageKind>) -> Self {
         Self(payload)
@@ -931,6 +965,82 @@ impl Kinds {
 #[rustfmt::skip]
 impl From<Vec<ChannelMessageKind>> for Kinds {
     fn from(payload: Vec<ChannelMessageKind>) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Duration {
+    pub fn new(payload: ChannelDuration) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelDuration {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelDuration {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelDuration> for Duration {
+    fn from(payload: ChannelDuration) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Channel {
+    pub fn new(payload: ChannelIdentifier) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelIdentifier {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelIdentifier {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelIdentifier> for Channel {
+    fn from(payload: ChannelIdentifier) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl Reason {
+    pub fn new(payload: TextBody) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &TextBody {
+        &self.0
+    }
+    pub fn into_payload(self) -> TextBody {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<TextBody> for Reason {
+    fn from(payload: TextBody) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl DeniedRequest {
+    pub fn new(payload: AdjudicationRequestIdentifier) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &AdjudicationRequestIdentifier {
+        &self.0
+    }
+    pub fn into_payload(self) -> AdjudicationRequestIdentifier {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<AdjudicationRequestIdentifier> for DeniedRequest {
+    fn from(payload: AdjudicationRequestIdentifier) -> Self {
         Self::new(payload)
     }
 }
@@ -1012,6 +1122,63 @@ impl From<AdjudicationRequestIdentifier> for DeniedAdjudication {
 }
 
 #[rustfmt::skip]
+impl Operation {
+    pub fn new(payload: OperationKind) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &OperationKind {
+        &self.0
+    }
+    pub fn into_payload(self) -> OperationKind {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<OperationKind> for Operation {
+    fn from(payload: OperationKind) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl OrderRejectionReason {
+    pub fn new(payload: ChannelOrderRejectionReason) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &ChannelOrderRejectionReason {
+        &self.0
+    }
+    pub fn into_payload(self) -> ChannelOrderRejectionReason {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<ChannelOrderRejectionReason> for OrderRejectionReason {
+    fn from(payload: ChannelOrderRejectionReason) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
+impl ImplementationReason {
+    pub fn new(payload: UnimplementedReason) -> Self {
+        Self(payload)
+    }
+    pub fn payload(&self) -> &UnimplementedReason {
+        &self.0
+    }
+    pub fn into_payload(self) -> UnimplementedReason {
+        self.0
+    }
+}
+#[rustfmt::skip]
+impl From<UnimplementedReason> for ImplementationReason {
+    fn from(payload: UnimplementedReason) -> Self {
+        Self::new(payload)
+    }
+}
+
+#[rustfmt::skip]
 impl ConnectionClass {
     pub fn non_owner_user(payload: Integer) -> Self {
         Self::NonOwnerUser(UnixUserIdentifier::new(payload))
@@ -1039,8 +1206,8 @@ impl ChannelEndpoint {
 
 #[rustfmt::skip]
 impl ChannelDuration {
-    pub fn time_bound(payload: Integer) -> Self {
-        Self::TimeBound(TimestampNanoseconds::new(payload))
+    pub fn time_bound(payload: TimestampNanoseconds) -> Self {
+        Self::TimeBound(payload)
     }
 }
 

@@ -15,13 +15,18 @@
 ;; enacts that decision here. Ordinary router observation traffic stays in
 ;; signal-router.
 ;;
-;; SELF-CONTAINED VOCABULARY. The upstream signal-persona-origin contract
+;; SHARED ROUTER TYPES. ChannelIdentifier and TimestampNanoseconds are
+;; imported from the ordinary signal-router contract so meta orders and
+;; router observations speak the same daemon-minted channel identity and
+;; timestamp vocabulary.
+;;
+;; LOCAL POLICY VOCABULARY. The upstream signal-persona-origin contract
 ;; is not yet an emitting wire contract, so this schema defines the policy
 ;; vocabulary it needs (ChannelEndpoint, ComponentName, ConnectionClass,
-;; ChannelIdentifier, ChannelDuration, ChannelMessageKind) LOCALLY. When
-;; signal-persona-origin becomes an emitting contract, these can migrate
-;; to cross-imports via the signal-persona-origin:lib:TypeName form
-;; (precedent: meta-signal-lojix cross-importing signal-lojix:lib types).
+;; ChannelDuration, ChannelMessageKind) LOCALLY. When signal-persona-origin
+;; becomes an emitting contract, these can migrate to cross-imports via the
+;; signal-persona-origin:lib:TypeName form (precedent: meta-signal-lojix
+;; cross-importing signal-lojix:lib types).
 ;;
 ;; OPERATION VOCABULARY. The four channel-authority meta operations mirror
 ;; the established router channel-authority surface exactly:
@@ -48,6 +53,10 @@
 ;; through ordinary channels, so the ChannelMessageKind enum names none of
 ;; them.
 
+{
+  ChannelIdentifier signal-router:lib:ChannelIdentifier
+  TimestampNanoseconds signal-router:lib:TimestampNanos
+}
 [Grant Extend Revoke Deny SetMirrorEnabled]
 [ChannelGranted ChannelExtended ChannelRevoked AdjudicationDenied ChannelOrderRejected RequestUnimplemented MirrorEnabledSet]
 {
@@ -67,8 +76,8 @@
 
   ;; The identifier a live channel is known by. Daemon-minted on Grant and
   ;; carried back in the GrantedChannel reply; callers reference an existing
-  ;; one on Extend / Revoke. String-shaped, never caller-supplied at create.
-  ChannelIdentifier String
+  ;; one on Extend / Revoke. Imported from signal-router, never caller-
+  ;; supplied at create.
 
   ;; The identifier of an adjudication request that meta policy declines.
   AdjudicationRequestIdentifier String
@@ -76,8 +85,8 @@
   ;; Free text carried on a revocation or denial reason.
   TextBody String
 
-  ;; A wall-clock instant in nanoseconds, used by a time-bound grant.
-  TimestampNanoseconds Integer
+  ;; A wall-clock instant in nanoseconds, used by a time-bound grant. This
+  ;; aliases signal-router's TimestampNanos type.
 
   ;; Whether the router's mirror path is switched on. Carried both as the
   ;; requested value on SetMirrorEnabled and as the confirmed value on
@@ -98,7 +107,8 @@
   EngineIdentifier String
   HostName String
   NetworkPeer String
-  OtherPersonaEngine { EngineIdentifier host.HostName }
+  Host HostName
+  OtherPersonaEngine { EngineIdentifier Host }
   ConnectionClass [Owner (NonOwnerUser UnixUserIdentifier) (System SystemPrincipal) (OtherPersona OtherPersonaEngine) (Network NetworkPeer)]
 
   ;; A channel endpoint is either an internal component or an external
@@ -126,24 +136,29 @@
   ;; The requested lifetime of a grant: one-shot, permanent, or bounded by
   ;; a wall-clock instant.
   ChannelDuration [OneShot Permanent (TimeBound TimestampNanoseconds)]
+  Kinds (Vector ChannelMessageKind)
+  Duration ChannelDuration
+  Channel ChannelIdentifier
+  Reason TextBody
+  DeniedRequest AdjudicationRequestIdentifier
 
   ;; Grant payload — the source/destination endpoints, the covered route
   ;; categories, and the requested duration.
   ChannelGrant {
     source.ChannelEndpoint
     destination.ChannelEndpoint
-    Kinds.(Vector ChannelMessageKind)
-    duration.ChannelDuration
+    Kinds
+    Duration
   }
 
   ;; Extend payload — change the duration of an existing live channel.
-  ChannelExtension { channel.ChannelIdentifier duration.ChannelDuration }
+  ChannelExtension { Channel Duration }
 
   ;; Revoke payload — remove a live channel, with a reason for the record.
-  ChannelRevocation { channel.ChannelIdentifier reason.TextBody }
+  ChannelRevocation { Channel Reason }
 
   ;; Deny payload — close an adjudication request without a grant.
-  AdjudicationDenial { request.AdjudicationRequestIdentifier reason.TextBody }
+  AdjudicationDenial { DeniedRequest Reason }
 
   ;; Reply payloads.
   GrantedChannel ChannelIdentifier
@@ -153,13 +168,16 @@
 
   ;; Which operation a rejection or unimplemented reply refers back to.
   OperationKind [Grant Extend Revoke Deny]
+  Operation OperationKind
 
   ;; The order was understood but rejected by router policy.
   ChannelOrderRejectionReason [MetaAuthorityRequired ChannelAlreadyExists ChannelMissing AdjudicationRequestMissing PolicyRefused]
-  RejectedChannelOrder { operation.OperationKind reason.ChannelOrderRejectionReason }
+  OrderRejectionReason ChannelOrderRejectionReason
+  RejectedChannelOrder { Operation OrderRejectionReason }
 
   ;; The request is in the contract but not implemented by the current
   ;; runtime.
   UnimplementedReason [NotBuiltYet DependencyNotReady PolicyStoreUnavailable]
-  UnimplementedRequest { operation.OperationKind reason.UnimplementedReason }
+  ImplementationReason UnimplementedReason
+  UnimplementedRequest { Operation ImplementationReason }
 }

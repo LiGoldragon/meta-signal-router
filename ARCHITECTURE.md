@@ -79,6 +79,8 @@ This repo owns:
 - meta-signal channel-policy operation roots and payload records;
 - meta-signal replies and rejection reasons;
 - rkyv and NOTA round-trip shape for the policy signal;
+- the `signal-router` imported channel identifier and timestamp types
+  shared with ordinary router observations;
 - the contract-local `OperationKind` witness and the `short_header`
   constants, emitted from `schema/lib.schema` by `schema-rust`.
 
@@ -106,9 +108,9 @@ This repo does not own:
 - Every operation root is a contract-local verb in verb form.
 - The wire shape contains no public Sema wrapper such as `Mutate` or
   `Retract`.
-- Channel identifiers are daemon-minted reply data or references to
-  existing channels; callers do not mint new channel identifiers for
-  grant creation.
+- Channel identifiers are imported from `signal-router` and remain
+  daemon-minted reply data or references to existing channels; callers
+  do not mint new channel identifiers for grant creation.
 - The contract crate contains no runtime actors, database handles,
   sockets, command execution, or policy evaluation logic.
 
@@ -116,14 +118,15 @@ This repo does not own:
 
 This crate is a real emitting wire contract, not a hand-written
 mirror. `schema/lib.schema` is the single source of truth; `build.rs`
-runs `schema-rust`'s `GenerationPlan::wire_contract` driver, which
-emits the `Input`/`Output` enums, the policy payload records and reply
-types, the NOTA codec (gated behind the `nota-text` feature), the
-route witnesses, the `short_header` constants, and the
-`encode_signal_frame` / `decode_signal_frame` helpers into the
-checked-in artifact at `src/schema/lib.rs`. The driver's
-`write_or_check` step asserts those artifacts stay byte-identical on
-every ordinary build; regenerate them with
+runs `schema-rust`'s TrueSchema `GenerationPlan::wire_contract` driver
+with the `signal-router` schema exposed by Cargo metadata, which emits
+the `Input`/`Output` enums, the policy payload records and reply types,
+the NOTA codec (gated behind the `nota-text` feature), the route
+witnesses, the `short_header` constants, and the `encode_signal_frame`
+/ `decode_signal_frame` helpers into the checked-in artifact at
+`src/schema/lib.rs`. The driver's `write_or_check` step asserts those
+artifacts stay byte-identical on every ordinary build; regenerate them
+with
 `META_SIGNAL_ROUTER_UPDATE_SCHEMA_ARTIFACTS=1 cargo build
 --all-features` after any schema edit.
 
@@ -150,7 +153,7 @@ listener.
 
 ```text
 schema/lib.schema     the meta channel-policy wire-contract schema (source of truth)
-build.rs              schema-rust wire_contract generation driver
+build.rs              TrueSchema wire_contract generation driver plus signal-router import
 src/lib.rs            re-exports the generated schema module
 src/schema/lib.rs     checked-in generated artifact (do not hand-edit)
 tests/round_trip.rs   rkyv + NOTA round trips and contract-local witnesses

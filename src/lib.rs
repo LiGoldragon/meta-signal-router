@@ -30,11 +30,100 @@ impl ChannelGrant {
             source,
             destination,
             kinds: Kinds::new(kinds),
-            duration,
+            duration: Duration::new(duration),
         }
     }
 
     pub fn kinds(&self) -> &[ChannelMessageKind] {
         self.kinds.payload().as_slice()
+    }
+
+    pub fn duration(&self) -> &ChannelDuration {
+        self.duration.payload()
+    }
+}
+
+impl ChannelExtension {
+    pub fn new(channel: ChannelIdentifier, duration: ChannelDuration) -> Self {
+        Self {
+            channel: Channel::new(channel),
+            duration: Duration::new(duration),
+        }
+    }
+
+    pub fn channel(&self) -> &ChannelIdentifier {
+        self.channel.payload()
+    }
+
+    pub fn duration(&self) -> &ChannelDuration {
+        self.duration.payload()
+    }
+}
+
+impl ChannelRevocation {
+    pub fn new(channel: ChannelIdentifier, reason: TextBody) -> Self {
+        Self {
+            channel: Channel::new(channel),
+            reason: Reason::new(reason),
+        }
+    }
+
+    pub fn channel(&self) -> &ChannelIdentifier {
+        self.channel.payload()
+    }
+
+    pub fn reason(&self) -> &TextBody {
+        self.reason.payload()
+    }
+}
+
+impl AdjudicationDenial {
+    pub fn new(request: AdjudicationRequestIdentifier, reason: TextBody) -> Self {
+        Self {
+            denied_request: DeniedRequest::new(request),
+            reason: Reason::new(reason),
+        }
+    }
+
+    pub fn request(&self) -> &AdjudicationRequestIdentifier {
+        self.denied_request.payload()
+    }
+
+    pub fn reason(&self) -> &TextBody {
+        self.reason.payload()
+    }
+}
+
+impl RejectedChannelOrder {
+    pub fn new(operation: OperationKind, reason: ChannelOrderRejectionReason) -> Self {
+        Self {
+            operation: Operation::new(operation),
+            order_rejection_reason: OrderRejectionReason::new(reason),
+        }
+    }
+
+    pub fn operation(&self) -> &OperationKind {
+        self.operation.payload()
+    }
+
+    pub fn reason(&self) -> &ChannelOrderRejectionReason {
+        self.order_rejection_reason.payload()
+    }
+}
+
+impl UnimplementedRequest {
+    pub fn new(operation: OperationKind, reason: UnimplementedReason) -> Self {
+        Self {
+            operation: Operation::new(operation),
+            implementation_reason: ImplementationReason::new(reason),
+        }
+    }
+
+    pub fn operation(&self) -> &OperationKind {
+        self.operation.payload()
+    }
+
+    pub fn reason(&self) -> &UnimplementedReason {
+        self.implementation_reason.payload()
     }
 }

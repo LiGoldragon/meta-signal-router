@@ -37,24 +37,24 @@ fn inputs() -> Vec<Input> {
     vec![
         Input::Grant(grant().into()),
         Input::Extend(
-            ChannelExtension {
-                channel: "channel-aab".to_owned().into(),
-                duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
-            }
+            ChannelExtension::new(
+                "channel-aab".to_owned().into(),
+                ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
+            )
             .into(),
         ),
         Input::Revoke(
-            ChannelRevocation {
-                channel: "channel-aab".to_owned().into(),
-                reason: "operator closed the path".to_owned().into(),
-            }
+            ChannelRevocation::new(
+                "channel-aab".to_owned().into(),
+                "operator closed the path".to_owned().into(),
+            )
             .into(),
         ),
         Input::Deny(
-            AdjudicationDenial {
-                request: "adjudication-aab".to_owned().into(),
-                reason: "destination unavailable".to_owned().into(),
-            }
+            AdjudicationDenial::new(
+                "adjudication-aab".to_owned().into(),
+                "destination unavailable".to_owned().into(),
+            )
             .into(),
         ),
         Input::set_mirror_enabled(MirrorEnabled::new(true)),
@@ -70,18 +70,15 @@ fn outputs() -> Vec<Output> {
             DeniedAdjudication::new("adjudication-aab".to_owned().into()).into(),
         ),
         Output::ChannelOrderRejected(
-            RejectedChannelOrder {
-                operation: OperationKind::Grant,
-                reason: ChannelOrderRejectionReason::PolicyRefused,
-            }
+            RejectedChannelOrder::new(
+                OperationKind::Grant,
+                ChannelOrderRejectionReason::PolicyRefused,
+            )
             .into(),
         ),
         Output::RequestUnimplemented(
-            UnimplementedRequest {
-                operation: OperationKind::Grant,
-                reason: UnimplementedReason::NotBuiltYet,
-            }
-            .into(),
+            UnimplementedRequest::new(OperationKind::Grant, UnimplementedReason::NotBuiltYet)
+                .into(),
         ),
         Output::mirror_enabled_set(MirrorEnabled::new(true)),
     ]
