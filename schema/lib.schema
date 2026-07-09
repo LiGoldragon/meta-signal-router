@@ -98,7 +98,7 @@
   EngineIdentifier String
   HostName String
   NetworkPeer String
-  OtherPersonaEngine { EngineIdentifier host.HostName }
+  OtherPersonaEngine { EngineIdentifier HostName }
   ConnectionClass [Owner (NonOwnerUser UnixUserIdentifier) (System SystemPrincipal) (OtherPersona OtherPersonaEngine) (Network NetworkPeer)]
 
   ;; A channel endpoint is either an internal component or an external
@@ -132,18 +132,18 @@
   ChannelGrant {
     source.ChannelEndpoint
     destination.ChannelEndpoint
-    Kinds.(Vector ChannelMessageKind)
-    duration.ChannelDuration
+    (Vector ChannelMessageKind)
+    ChannelDuration
   }
 
   ;; Extend payload — change the duration of an existing live channel.
-  ChannelExtension { channel.ChannelIdentifier duration.ChannelDuration }
+  ChannelExtension { ChannelIdentifier ChannelDuration }
 
   ;; Revoke payload — remove a live channel, with a reason for the record.
-  ChannelRevocation { channel.ChannelIdentifier reason.TextBody }
+  ChannelRevocation { ChannelIdentifier TextBody }
 
   ;; Deny payload — close an adjudication request without a grant.
-  AdjudicationDenial { request.AdjudicationRequestIdentifier reason.TextBody }
+  AdjudicationDenial { AdjudicationRequestIdentifier TextBody }
 
   ;; Reply payloads.
   GrantedChannel ChannelIdentifier
@@ -156,10 +156,10 @@
 
   ;; The order was understood but rejected by router policy.
   ChannelOrderRejectionReason [MetaAuthorityRequired ChannelAlreadyExists ChannelMissing AdjudicationRequestMissing PolicyRefused]
-  RejectedChannelOrder { operation.OperationKind reason.ChannelOrderRejectionReason }
+  RejectedChannelOrder { OperationKind ChannelOrderRejectionReason }
 
   ;; The request is in the contract but not implemented by the current
   ;; runtime.
   UnimplementedReason [NotBuiltYet DependencyNotReady PolicyStoreUnavailable]
-  UnimplementedRequest { operation.OperationKind reason.UnimplementedReason }
+  UnimplementedRequest { OperationKind UnimplementedReason }
 }

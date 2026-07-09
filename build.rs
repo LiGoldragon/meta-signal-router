@@ -25,7 +25,7 @@ impl SchemaBuild {
         GenerationDriver::new(GenerationPlan::wire_contract(
             &self.crate_root,
             "meta-signal-router",
-            "0.3.0",
+            "0.4.0",
         ))
         .generate()
         .expect("generate meta-signal-router schema artifacts")

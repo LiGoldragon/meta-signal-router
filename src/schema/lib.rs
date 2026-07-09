@@ -224,7 +224,7 @@ pub struct NetworkPeer(String);
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct OtherPersonaEngine {
     pub engine_identifier: EngineIdentifier,
-    pub host: HostName,
+    pub host_name: HostName,
 }
 
 #[rustfmt::skip]
@@ -300,19 +300,11 @@ pub enum ChannelDuration {
     derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct Kinds(Vec<ChannelMessageKind>);
-
-#[rustfmt::skip]
-#[cfg_attr(
-    feature = "nota-text",
-    derive(nota::NotaDecode, nota::NotaDecodeTraced, nota::NotaEncode)
-)]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelGrant {
     pub source: ChannelEndpoint,
     pub destination: ChannelEndpoint,
-    pub(crate) kinds: Kinds,
-    pub duration: ChannelDuration,
+    pub channel_message_kind_vector: Vec<ChannelMessageKind>,
+    pub channel_duration: ChannelDuration,
 }
 
 #[rustfmt::skip]
@@ -322,8 +314,8 @@ pub struct ChannelGrant {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelExtension {
-    pub channel: ChannelIdentifier,
-    pub duration: ChannelDuration,
+    pub channel_identifier: ChannelIdentifier,
+    pub channel_duration: ChannelDuration,
 }
 
 #[rustfmt::skip]
@@ -333,8 +325,8 @@ pub struct ChannelExtension {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChannelRevocation {
-    pub channel: ChannelIdentifier,
-    pub reason: TextBody,
+    pub channel_identifier: ChannelIdentifier,
+    pub text_body: TextBody,
 }
 
 #[rustfmt::skip]
@@ -344,8 +336,8 @@ pub struct ChannelRevocation {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AdjudicationDenial {
-    pub request: AdjudicationRequestIdentifier,
-    pub reason: TextBody,
+    pub adjudication_request_identifier: AdjudicationRequestIdentifier,
+    pub text_body: TextBody,
 }
 
 #[rustfmt::skip]
@@ -432,8 +424,8 @@ pub enum ChannelOrderRejectionReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RejectedChannelOrder {
-    pub operation: OperationKind,
-    pub reason: ChannelOrderRejectionReason,
+    pub operation_kind: OperationKind,
+    pub channel_order_rejection_reason: ChannelOrderRejectionReason,
 }
 
 #[rustfmt::skip]
@@ -464,8 +456,8 @@ pub enum UnimplementedReason {
 )]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct UnimplementedRequest {
-    pub operation: OperationKind,
-    pub reason: UnimplementedReason,
+    pub operation_kind: OperationKind,
+    pub unimplemented_reason: UnimplementedReason,
 }
 
 #[rustfmt::skip]
@@ -912,25 +904,6 @@ impl NetworkPeer {
 #[rustfmt::skip]
 impl From<String> for NetworkPeer {
     fn from(payload: String) -> Self {
-        Self::new(payload)
-    }
-}
-
-#[rustfmt::skip]
-impl Kinds {
-    pub fn new(payload: Vec<ChannelMessageKind>) -> Self {
-        Self(payload)
-    }
-    pub fn payload(&self) -> &Vec<ChannelMessageKind> {
-        &self.0
-    }
-    pub fn into_payload(self) -> Vec<ChannelMessageKind> {
-        self.0
-    }
-}
-#[rustfmt::skip]
-impl From<Vec<ChannelMessageKind>> for Kinds {
-    fn from(payload: Vec<ChannelMessageKind>) -> Self {
         Self::new(payload)
     }
 }

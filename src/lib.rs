@@ -29,12 +29,12 @@ impl ChannelGrant {
         Self {
             source,
             destination,
-            kinds: Kinds::new(kinds),
-            duration,
+            channel_message_kind_vector: kinds,
+            channel_duration: duration,
         }
     }
 
     pub fn kinds(&self) -> &[ChannelMessageKind] {
-        self.kinds.payload().as_slice()
+        self.channel_message_kind_vector.as_slice()
     }
 }

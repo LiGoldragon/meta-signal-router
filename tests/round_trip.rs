@@ -38,22 +38,22 @@ fn inputs() -> Vec<Input> {
         Input::Grant(grant().into()),
         Input::Extend(
             ChannelExtension {
-                channel: "channel-aab".to_owned().into(),
-                duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
+                channel_identifier: "channel-aab".to_owned().into(),
+                channel_duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
             }
             .into(),
         ),
         Input::Revoke(
             ChannelRevocation {
-                channel: "channel-aab".to_owned().into(),
-                reason: "operator closed the path".to_owned().into(),
+                channel_identifier: "channel-aab".to_owned().into(),
+                text_body: "operator closed the path".to_owned().into(),
             }
             .into(),
         ),
         Input::Deny(
             AdjudicationDenial {
-                request: "adjudication-aab".to_owned().into(),
-                reason: "destination unavailable".to_owned().into(),
+                adjudication_request_identifier: "adjudication-aab".to_owned().into(),
+                text_body: "destination unavailable".to_owned().into(),
             }
             .into(),
         ),
@@ -71,15 +71,15 @@ fn outputs() -> Vec<Output> {
         ),
         Output::ChannelOrderRejected(
             RejectedChannelOrder {
-                operation: OperationKind::Grant,
-                reason: ChannelOrderRejectionReason::PolicyRefused,
+                operation_kind: OperationKind::Grant,
+                channel_order_rejection_reason: ChannelOrderRejectionReason::PolicyRefused,
             }
             .into(),
         ),
         Output::RequestUnimplemented(
             UnimplementedRequest {
-                operation: OperationKind::Grant,
-                reason: UnimplementedReason::NotBuiltYet,
+                operation_kind: OperationKind::Grant,
+                unimplemented_reason: UnimplementedReason::NotBuiltYet,
             }
             .into(),
         ),
