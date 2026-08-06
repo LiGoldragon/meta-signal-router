@@ -1,167 +1,119 @@
-# meta-signal-router — architecture
+# meta-signal-router architecture
 
-*Meta-signal Signal contract for PersonaRouter channel policy.*
+`meta-signal-router` is the owner channel-authority Interface of Router. It is
+the narrow relation through which Orchestrate changes which channel paths
+Router admits. Mind may decide that policy should change, but Orchestrate owns
+the Router relation and produces this Interface's requests.
 
-## 0.5 · Direction
+## Semantic center
 
-`meta-signal-router` is the meta policy contract for PersonaRouter channel authority. The caller is `orchestrate`: Mind decides whether channel policy should change, orders Orchestrate through `meta-signal-orchestrate`, and Orchestrate enacts that decision here. The intended caller is Orchestrate, not Mind; Mind reaches Router channel policy by ordering Orchestrate first. Channel-authority orders live only in this meta-signal contract; ordinary router observation traffic stays in `signal-router`.
+A channel grant relates a source endpoint, a destination endpoint, the message
+kinds admitted between them, and a lifetime. The Interface can create that
+relation, change its lifetime, remove it, or record that an adjudication did not
+produce one. A separate owner-only operation controls Router's persisted mirror
+gate. These are policy acts on Router, not ordinary routed-message categories.
 
-## 0 · TL;DR
+The operation surface is:
 
-`meta-signal-router` is the policy signal for
-PersonaRouter channel authority. It carries meta-signal orders that
-grant, extend, revoke, or deny channel authority in the router.
-The caller is PersonaOrchestrate, because Orchestrate owns Router in
-the authority graph. Mind decides whether channel policy should
-change, then orders Orchestrate through `meta-signal-orchestrate`;
-Orchestrate enacts that decision here.
+| Request | Meaning |
+| --- | --- |
+| `Grant` | Install channel authority for an endpoint relation. |
+| `Extend` | Replace the lifetime of an existing grant. |
+| `Revoke` | Remove an existing grant and carry its reason. |
+| `Deny` | Close an adjudication request without a grant. |
+| `SetMirrorEnabled` | Set the persisted, owner-only mirror gate. |
 
-Ordinary router observation traffic stays in `signal-router`.
-Router-to-Mind adjudication observation stays in the Mind working
-contract until that relation is deliberately moved. Runtime actors,
-policy evaluation, socket binding, durable grant tables, and command
-lowering live in `router`.
+Replies confirm the four channel-policy acts and the mirror setting, or return
+an explicit policy rejection or implementation refusal. `OperationKind` names
+only operations to which those refusals apply. `ChannelMessageKind` deliberately
+contains none of the policy verbs.
 
-The initial surface is deliberately small:
+## Vocabulary ownership
 
-- `Grant(ChannelGrant)` grants a router channel.
-- `Extend(ChannelExtension)` extends an existing router channel.
-- `Revoke(ChannelRevocation)` revokes an existing router channel.
-- `Deny(AdjudicationDenial)` closes an adjudication request without a
-  grant.
+This Interface owns policy-specific relations and distinctions:
 
-## 1 · Contract Surface
+- `ChannelGrant`, `ChannelExtension`, `ChannelRevocation`, and
+  `AdjudicationDenial`;
+- `ConnectionClass`, `ChannelEndpoint`, `ChannelMessageKind`, and
+  `ChannelDuration`;
+- rejection, unimplemented, request-root, and reply-root declarations.
 
-| Side | Component |
-|---|---|
-| Request producer | `orchestrate` meta-signal actor. |
-| Request consumer | `router` meta-signal actor. |
-| Decision source upstream | `mind`, through `meta-signal-orchestrate`. |
+It imports identities whose meaning is already owned elsewhere:
 
-| Operation | Projected Sema class | Meaning |
-|---|---|---|
-| `Grant` | `Mutate` | Apply meta authority by creating or replacing a live channel grant. |
-| `Extend` | `Mutate` | Change the duration of a live channel grant. |
-| `Revoke` | `Retract` | Remove a live channel grant. |
-| `Deny` | `Mutate` | Record a meta-policy decision that an adjudication request will not receive a grant. |
+| Producer | Imported declarations |
+| --- | --- |
+| `signal-router` | `ChannelIdentifier`, `EngineIdentifier`, `TimestampNanos`, `UnixUserIdentifier` |
+| `signal-standard` | `ComponentKind`, `HostName`, `NetworkEndpoint` |
 
-The Sema classes above are daemon-side projections. The wire carries
-contract-local operation roots only; there is no public `Mutate` or
-`Retract` wrapper.
+The imports are producer identities, not copied declarations or readable Rust
+aliases. `build.rs` resolves each producer's Cargo-published Ethos directory,
+proves it is the exact source compiled by the pinned dependency, imports its
+authority seats, and projects an explicit encoded Rust path for each type.
 
-| Reply | Meaning |
-|---|---|
-| `ChannelGranted` | The router accepted and recorded a channel grant. |
-| `ChannelExtended` | The router accepted and recorded a channel extension. |
-| `ChannelRevoked` | The router accepted and recorded a channel revocation. |
-| `AdjudicationDenied` | The router accepted and recorded an adjudication denial. |
-| `ChannelOrderRejected` | The order was understood but rejected by router policy. |
-| `RequestUnimplemented` | The request is in the contract but not implemented by the current runtime. |
+`ComponentKind` gives internal endpoints the estate-wide component vocabulary.
+`NetworkEndpoint` gives network connection classes a structured host and port;
+an opaque contract-local peer string is not retained. Other persona engines
+combine the ordinary Router engine identity with the shared host identity.
 
-## 2 · Policy Types
+## Authority and projection
 
-`ChannelEndpoint` names internal component endpoints and external
-connection classes using `signal-persona-origin` vocabulary.
+`ethos/interface.ethos` is a role-free `Interface.{1 0 0}` and the only schema
+source. The three role lists are empty. `MetaRouterRequest` and
+`MetaRouterReply` are ordinary declarations because request/reply seating is
+behavior at this bootstrap stage, not textual authority smuggled into a role
+slot.
 
-`ChannelMessageKind` names route categories that can be covered by a
-grant. Meta-order names such as channel grant, extension, revocation,
-and denial are intentionally absent from this enum; those are
-operations on this meta-signal contract, not message categories being
-routed through ordinary channels.
+`src/bootstrap_manifest.rs` contains the explicit, already-minted authority,
+grammar, declaration, variant, and canonical-order seats. `build.rs` constructs
+the prior catalog, adds the exact producer seats, authorizes precisely the
+manifested transition, revalidates it through Core Ethos/Nomos, and asks Rust
+Logos for the checked encoded projection at
+`src/schema/lib/generated.rs`.
 
-`ChannelDuration` is the requested lifetime: one-shot, permanent, or
-time-bound.
+The generated file contains only encoded coordinates. Visible spellings remain
+in Ethos, Dotos, diagnostics, and explicit route behavior; no readable schema
+type is copied into Rust.
 
-## 3 · Boundaries
+`src/schema/lib/behavior.rs` owns the behavior not yet expressed by the
+bootstrap language:
 
-This repo owns:
+- structural conversion for local and imported values;
+- Dotos encoding and decoding at the text edge;
+- rkyv behavior for encoded declarations;
+- request/reply route seating;
+- Signal framing at contract binding 8, wire revision 2.
 
-- meta-signal channel-policy operation roots and payload records;
-- meta-signal replies and rejection reasons;
-- rkyv and NOTA round-trip shape for the policy signal;
-- the contract-local `OperationKind` witness and the `short_header`
-  constants, emitted from `schema/lib.schema` by `schema-rust`.
+The structural adapters translate the common recursive wire shape at producer
+boundaries. They do not rename, wrap, or redefine imported identities.
 
-This repo does not own:
+## Boundaries
 
-- `router` daemon actors;
-- router durable grant tables;
-- Mind's channel-policy decisions;
-- Orchestrate's translation from Mind-level decision to Router-level
-  channel order;
-- bootstrap policy files;
-- ordinary router observation traffic in `signal-router`;
-- Mind graph, work graph, or adjudication observation records in
-  `signal-mind`;
-- CLI argv parsing or socket permissions.
+This repository contains no Router actor, policy evaluator, durable grant
+table, socket listener, bootstrap file reader, CLI parser, or command lowering.
+Those belong to the `router` runtime. Ordinary observation, forwarding,
+session, bootstrap, and actor-registration relations belong to
+`signal-router`.
 
-## 4 · Constraints
+The contract assumes no permanent compiler, host language, transport process,
+or operating system. Its durable meaning is the relation expressed in Ethos;
+Rust, rkyv, and the current Signal envelope are projections and behavior at the
+present machine boundary.
 
-- The contract exposes meta-signal router channel-policy operations,
-  not ordinary router observation queries.
-- The intended caller is Orchestrate, not Mind; Mind reaches Router
-  channel policy by ordering Orchestrate first.
-- Grant, extension, revocation, and denial are meta operations on
-  this contract, not message kinds in the routed-channel vocabulary.
-- Every operation root is a contract-local verb in verb form.
-- The wire shape contains no public Sema wrapper such as `Mutate` or
-  `Retract`.
-- Channel identifiers are daemon-minted reply data or references to
-  existing channels; callers do not mint new channel identifiers for
-  grant creation.
-- The contract crate contains no runtime actors, database handles,
-  sockets, command execution, or policy evaluation logic.
+## Verification
 
-## 5 · Emission
+The witness suite proves:
 
-This crate is a real emitting wire contract, not a hand-written
-mirror. `schema/lib.schema` is the single source of truth; `build.rs`
-runs `schema-rust`'s `GenerationPlan::wire_contract` driver, which
-emits the `Input`/`Output` enums, the policy payload records and reply
-types, the NOTA codec (gated behind the `nota-text` feature), the
-route witnesses, the `short_header` constants, and the
-`encode_signal_frame` / `decode_signal_frame` helpers into the
-checked-in artifact at `src/schema/lib.rs`. The driver's
-`write_or_check` step asserts those artifacts stay byte-identical on
-every ordinary build; regenerate them with
-`META_SIGNAL_ROUTER_UPDATE_SCHEMA_ARTIFACTS=1 cargo build
---all-features` after any schema edit.
+- every one of the five requests traverses the bound Signal frame;
+- every one of the seven replies traverses Signal and rkyv;
+- every root round-trips through Dotos with its visible head;
+- canonical Dotos examples are exact;
+- imported Router and standard types cross the structural boundary;
+- the producer pins and corrected generator revision are exact;
+- bootstrap dependencies do not enter the default runtime graph;
+- the legacy schema source, emitter vocabulary, Nota edge, and copied
+  declarations are absent.
 
-The raw contract frame is a contract-local short header followed by the
-rkyv archive. The `router` daemon will carry those bytes through the
-triad-runtime length-prefixed process envelope when it binds the meta
-listener.
-
-## 6 · Witness Tests
-
-`tests/round_trip.rs` proves:
-
-- operations round-trip through the rkyv archive;
-- replies round-trip through the rkyv archive;
-- operations and replies round-trip through the emitted signal-frame
-  helpers;
-- the `short_header` constants are contract-local and distinct;
-- operations and replies round-trip through NOTA text and carry
-  contract-local verb heads (`(Grant …)`) with no `Mutate`/`Retract`
-  wrapper;
-- meta-order names are absent from `ChannelMessageKind`.
-
-## Code Map
-
-```text
-schema/lib.schema     the meta channel-policy wire-contract schema (source of truth)
-build.rs              schema-rust wire_contract generation driver
-src/lib.rs            re-exports the generated schema module
-src/schema/lib.rs     checked-in generated artifact (do not hand-edit)
-tests/round_trip.rs   rkyv + NOTA round trips and contract-local witnesses
-```
-
-## See Also
-
-- `../signal-router/ARCHITECTURE.md`
-- `../router/ARCHITECTURE.md`
-- `../signal-mind/ARCHITECTURE.md`
-- `../signal-frame/ARCHITECTURE.md`
-- `../signal-sema/ARCHITECTURE.md`
-- `~/primary/skills/contract-repo.md`
-- `~/primary/skills/component-triad.md`
+After changing the Interface, update the explicit manifest first and regenerate
+with `META_SIGNAL_ROUTER_UPDATE_INTERFACE_ARTIFACTS=1 cargo build
+--all-features`. An ordinary build must then prove the checked projection is
+fresh without the update variable.

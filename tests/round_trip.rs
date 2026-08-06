@@ -1,225 +1,149 @@
-//! Witness tests for the meta-signal-router wire contract.
-//!
-//! Proves the schema-emitted policy operations and replies round-trip
-//! through the rkyv archive and through NOTA text, that each variant maps
-//! to its contract-local short header, and that meta-order names never
-//! appear in the routed-message-kind vocabulary.
-//!
-//! The current refreshed schema-rust base emits, for a pure
-//! `wire_contract()` target, the wire types + NOTA codec + route
-//! witnesses + the `short_header` constant module + signal-frame helpers.
-//! The daemon wraps those contract frames in the triad-runtime
-//! length-prefixed envelope.
+use meta_signal_router::*;
 
-use meta_signal_router::{
-    AdjudicationDenial, ChannelDuration, ChannelEndpoint, ChannelExtension, ChannelGrant,
-    ChannelMessageKind, ChannelOrderRejectionReason, ChannelRevocation, ComponentName,
-    ConnectionClass, DeniedAdjudication, ExtendedChannel, GrantedChannel, Input, MirrorEnabled,
-    OperationKind, Output, RejectedChannelOrder, RevokedChannel, UnimplementedReason,
-    UnimplementedRequest, short_header,
-};
-#[cfg(feature = "nota-text")]
-use nota::NotaEncode;
-
-fn grant() -> ChannelGrant {
-    ChannelGrant::new(
-        ChannelEndpoint::External(ConnectionClass::Owner),
-        ChannelEndpoint::Internal(ComponentName::Router),
-        vec![
-            ChannelMessageKind::MessageSubmission,
-            ChannelMessageKind::InboxQuery,
-        ],
-        ChannelDuration::Permanent,
-    )
-}
-
-fn inputs() -> Vec<Input> {
+fn requests() -> Vec<(z2VVKk, &'static str)> {
     vec![
-        Input::Grant(grant().into()),
-        Input::Extend(
-            ChannelExtension {
-                channel_identifier: "channel-aab".to_owned().into(),
-                channel_duration: ChannelDuration::TimeBound(1_730_000_000_000_000_000.into()),
-            }
-            .into(),
+        (
+            z2VVKk::z2VLcZ(z2VLSg {
+                field_0: signal_router::schema::lib::z2VUhk::new("channel-aab".to_owned()),
+                field_1: z2VWgk::z2VXGt(signal_router::schema::lib::z2VQGK::new(7)),
+            }),
+            "Extend",
         ),
-        Input::Revoke(
-            ChannelRevocation {
-                channel_identifier: "channel-aab".to_owned().into(),
-                text_body: "operator closed the path".to_owned().into(),
-            }
-            .into(),
+        (
+            z2VVKk::z2VKx6(z2VWSR {
+                field_0: z2VSet::new("fixture".to_owned()),
+                field_1: z2VXGr::new("fixture".to_owned()),
+            }),
+            "Deny",
         ),
-        Input::Deny(
-            AdjudicationDenial {
-                adjudication_request_identifier: "adjudication-aab".to_owned().into(),
-                text_body: "destination unavailable".to_owned().into(),
-            }
-            .into(),
+        (z2VVKk::z2VYZY(z2VZs4::new(true)), "SetMirrorEnabled"),
+        (
+            z2VVKk::z2VTdF(z2VRn4 {
+                field_0: signal_router::schema::lib::z2VUhk::new("channel-aab".to_owned()),
+                field_1: z2VXGr::new("fixture".to_owned()),
+            }),
+            "Revoke",
         ),
-        Input::set_mirror_enabled(MirrorEnabled::new(true)),
+        (
+            z2VVKk::z2VQkd(z2VXEz {
+                field_0: z2Vbxp::z2Va3A(z2VVrv::z2VRvM(signal_standard::schema::lib::z2VaVE {
+                    field_0: signal_standard::schema::lib::z2VLyh::new("host-aab".to_owned()),
+                    field_1: signal_standard::schema::lib::z2VQaE::new(7),
+                })),
+                field_1: z2Vbxp::z2Va3A(z2VVrv::z2VRvM(signal_standard::schema::lib::z2VaVE {
+                    field_0: signal_standard::schema::lib::z2VLyh::new("host-aab".to_owned()),
+                    field_1: signal_standard::schema::lib::z2VQaE::new(7),
+                })),
+                field_2: Vec::new(),
+                field_3: z2VWgk::z2VXGt(signal_router::schema::lib::z2VQGK::new(7)),
+            }),
+            "Grant",
+        ),
     ]
 }
 
-fn outputs() -> Vec<Output> {
+fn replies() -> Vec<(z2VZMR, &'static str)> {
     vec![
-        Output::ChannelGranted(GrantedChannel::new("channel-aab".to_owned().into()).into()),
-        Output::ChannelExtended(ExtendedChannel::new("channel-aab".to_owned().into()).into()),
-        Output::ChannelRevoked(RevokedChannel::new("channel-aab".to_owned().into()).into()),
-        Output::AdjudicationDenied(
-            DeniedAdjudication::new("adjudication-aab".to_owned().into()).into(),
+        (
+            z2VZMR::z2VPNU(z2VbCv {
+                field_0: z2VMzP::z2VVom,
+                field_1: z2VL5G::z2VeAc,
+            }),
+            "ChannelOrderRejected",
         ),
-        Output::ChannelOrderRejected(
-            RejectedChannelOrder {
-                operation_kind: OperationKind::Grant,
-                channel_order_rejection_reason: ChannelOrderRejectionReason::PolicyRefused,
-            }
-            .into(),
+        (
+            z2VZMR::z2VRJ5(z2VUEJ::new(signal_router::schema::lib::z2VUhk::new(
+                "channel-aab".to_owned(),
+            ))),
+            "ChannelGranted",
         ),
-        Output::RequestUnimplemented(
-            UnimplementedRequest {
-                operation_kind: OperationKind::Grant,
-                unimplemented_reason: UnimplementedReason::NotBuiltYet,
-            }
-            .into(),
+        (
+            z2VZMR::z2VSbY(z2VMyn::new(z2VSet::new("fixture".to_owned()))),
+            "AdjudicationDenied",
         ),
-        Output::mirror_enabled_set(MirrorEnabled::new(true)),
+        (z2VZMR::z2VWPR(z2VZs4::new(true)), "MirrorEnabledSet"),
+        (
+            z2VZMR::z2VXtU(z2VShs::new(signal_router::schema::lib::z2VUhk::new(
+                "channel-aab".to_owned(),
+            ))),
+            "ChannelRevoked",
+        ),
+        (
+            z2VZMR::z2VZzt(z2VPBk::new(signal_router::schema::lib::z2VUhk::new(
+                "channel-aab".to_owned(),
+            ))),
+            "ChannelExtended",
+        ),
+        (
+            z2VZMR::z2VLEb(z2VSuA {
+                field_0: z2VMzP::z2VVom,
+                field_1: z2VXAD::z2VYnp,
+            }),
+            "RequestUnimplemented",
+        ),
     ]
 }
 
 #[test]
-fn input_operations_round_trip_through_rkyv() {
-    for input in inputs() {
-        let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&input).expect("rkyv encode input");
+fn every_request_round_trips_through_the_bound_frame() {
+    for (request, _head) in requests() {
+        let expected = request.clone();
+        let exchange = signal_frame::ExchangeIdentifier::new(
+            signal_frame::SessionEpoch::new(41),
+            signal_frame::ExchangeLane::Connector,
+            signal_frame::LaneSequence::first(),
+        );
+        let encoded = request
+            .encode_request_frame(exchange)
+            .expect("request frame encodes");
+        let (decoded_exchange, decoded) =
+            ContractMarker::decode_single_request(&encoded).expect("request frame decodes");
+        assert_eq!(decoded_exchange, exchange);
+        assert_eq!(decoded, expected);
+    }
+}
+
+#[test]
+fn every_reply_has_bound_frame_and_rkyv_behavior() {
+    for (reply, _head) in replies() {
+        let expected = reply.clone();
+        let exchange = signal_frame::ExchangeIdentifier::new(
+            signal_frame::SessionEpoch::new(43),
+            signal_frame::ExchangeLane::Connector,
+            signal_frame::LaneSequence::first(),
+        );
+        let encoded = reply
+            .clone()
+            .encode_reply_frame(exchange)
+            .expect("reply frame encodes");
+        ContractMarker::decode_frame(&encoded).expect("reply frame decodes");
+
+        let archive = rkyv::to_bytes::<rkyv::rancor::Error>(&reply).expect("reply archives");
         let recovered =
-            rkyv::from_bytes::<Input, rkyv::rancor::Error>(&bytes).expect("rkyv decode input");
-        assert_eq!(recovered, input);
+            rkyv::from_bytes::<z2VZMR, rkyv::rancor::Error>(&archive).expect("reply recovers");
+        assert_eq!(recovered, expected);
     }
 }
 
+#[cfg(feature = "dotos-text")]
 #[test]
-fn output_replies_round_trip_through_rkyv() {
-    for output in outputs() {
-        let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&output).expect("rkyv encode output");
-        let recovered =
-            rkyv::from_bytes::<Output, rkyv::rancor::Error>(&bytes).expect("rkyv decode output");
-        assert_eq!(recovered, output);
+fn every_root_round_trips_through_dotos_with_visible_heads() {
+    use dotos::{DotosEncode, DotosSource};
+
+    for (request, head) in requests() {
+        let text = request.to_dotos();
+        assert!(text.starts_with(&format!("{head}.")), "{text}");
+        let recovered = DotosSource::new(&text)
+            .parse::<z2VVKk>()
+            .expect("request Dotos decodes");
+        assert_eq!(recovered, request);
     }
-}
-
-#[test]
-fn input_operations_round_trip_through_signal_frame() {
-    for input in inputs() {
-        let frame = input
-            .encode_signal_frame()
-            .expect("encode input signal frame");
-        let (route, recovered) =
-            Input::decode_signal_frame(&frame).expect("decode input signal frame");
-        assert_eq!(route, input.route());
-        assert_eq!(recovered, input);
-    }
-}
-
-#[test]
-fn output_replies_round_trip_through_signal_frame() {
-    for output in outputs() {
-        let frame = output
-            .encode_signal_frame()
-            .expect("encode output signal frame");
-        let (route, recovered) =
-            Output::decode_signal_frame(&frame).expect("decode output signal frame");
-        assert_eq!(route, output.route());
-        assert_eq!(recovered, output);
-    }
-}
-
-#[test]
-fn short_headers_are_contract_local_and_distinct() {
-    let headers = [
-        short_header::INPUT_GRANT,
-        short_header::INPUT_EXTEND,
-        short_header::INPUT_REVOKE,
-        short_header::INPUT_DENY,
-        short_header::INPUT_SET_MIRROR_ENABLED,
-        short_header::OUTPUT_CHANNEL_GRANTED,
-        short_header::OUTPUT_CHANNEL_EXTENDED,
-        short_header::OUTPUT_CHANNEL_REVOKED,
-        short_header::OUTPUT_ADJUDICATION_DENIED,
-        short_header::OUTPUT_CHANNEL_ORDER_REJECTED,
-        short_header::OUTPUT_REQUEST_UNIMPLEMENTED,
-        short_header::OUTPUT_MIRROR_ENABLED_SET,
-    ];
-    for (outer_index, outer) in headers.iter().enumerate() {
-        for (inner_index, inner) in headers.iter().enumerate() {
-            if outer_index != inner_index {
-                assert_ne!(outer, inner, "short headers must be distinct");
-            }
-        }
-    }
-}
-
-#[cfg(feature = "nota-text")]
-#[test]
-fn input_operations_round_trip_through_nota_text() {
-    for input in inputs() {
-        let text = input.to_nota();
-        let recovered: Input = text.parse().expect("parse input nota");
-        assert_eq!(recovered, input);
-        assert!(!text.contains("Mutate"));
-        assert!(!text.contains("Retract"));
-        assert!(!text.contains("Assert"));
-    }
-}
-
-#[cfg(feature = "nota-text")]
-#[test]
-fn output_replies_round_trip_through_nota_text() {
-    for output in outputs() {
-        let text = output.to_nota();
-        let recovered: Output = text.parse().expect("parse output nota");
-        assert_eq!(recovered, output);
-    }
-}
-
-#[cfg(feature = "nota-text")]
-#[test]
-fn grant_operation_encodes_as_contract_local_nota_head() {
-    let text = Input::Grant(grant().into()).to_nota();
-    assert!(
-        text.starts_with("(Grant"),
-        "expected Grant head, got {text}"
-    );
-    let recovered: Input = text.parse().expect("parse grant nota");
-    assert_eq!(recovered, Input::Grant(grant().into()));
-}
-
-#[cfg(feature = "nota-text")]
-#[test]
-fn meta_order_names_are_not_channel_message_kinds() {
-    let kinds = [
-        ChannelMessageKind::MessageIngressSubmission,
-        ChannelMessageKind::MessageSubmission,
-        ChannelMessageKind::InboxQuery,
-        ChannelMessageKind::FocusObservation,
-        ChannelMessageKind::PromptBufferObservation,
-        ChannelMessageKind::MessageDelivery,
-        ChannelMessageKind::TerminalInput,
-        ChannelMessageKind::TerminalCapture,
-        ChannelMessageKind::TerminalResize,
-        ChannelMessageKind::TranscriptEvent,
-        ChannelMessageKind::AdjudicationRequest,
-        ChannelMessageKind::DeliveryNotification,
-    ];
-    for kind in kinds {
-        let text = kind.to_nota();
-        assert_ne!(text, "ChannelGrant");
-        assert_ne!(text, "ChannelExtend");
-        assert_ne!(text, "ChannelRevoke");
-        assert_ne!(text, "AdjudicationDeny");
-        assert_ne!(text, "AdjudicationDenial");
-        assert_ne!(text, "Grant");
-        assert_ne!(text, "Extend");
-        assert_ne!(text, "Revoke");
-        assert_ne!(text, "Deny");
+    for (reply, head) in replies() {
+        let text = reply.to_dotos();
+        assert!(text.starts_with(&format!("{head}.")), "{text}");
+        let recovered = DotosSource::new(&text)
+            .parse::<z2VZMR>()
+            .expect("reply Dotos decodes");
+        assert_eq!(recovered, reply);
     }
 }

@@ -1,5 +1,5 @@
 {
-  description = "meta-signal-router - MetaSignal contract for PersonaRouter channel policy";
+  description = "meta-signal-router - owner Router channel-authority Interface";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -37,12 +37,15 @@
             path: type:
             let
               pathString = toString path;
-              schemaRoot = "${toString ./.}/schema";
+              ethosRoot = "${toString ./.}/ethos";
+              examplesRoot = "${toString ./.}/examples";
             in
             type == "directory"
             || craneLib.filterCargoSources path type
-            || pathString == schemaRoot
-            || pkgs.lib.hasPrefix "${schemaRoot}/" pathString;
+            || pathString == ethosRoot
+            || pkgs.lib.hasPrefix "${ethosRoot}/" pathString
+            || pathString == examplesRoot
+            || pkgs.lib.hasPrefix "${examplesRoot}/" pathString;
           name = "source";
         };
         commonArgs = {
@@ -63,11 +66,26 @@
               cargoTestExtraArgs = "--test round_trip";
             }
           );
+          test-interface-contract = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--test interface_contract";
+            }
+          );
+          test-dotos-text = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTestExtraArgs = "--features dotos-text --all-targets";
+            }
+          );
           doc = craneLib.cargoDoc (
             commonArgs
             // {
               inherit cargoArtifacts;
               RUSTDOCFLAGS = "-D warnings";
+              cargoDocExtraArgs = "--all-features";
             }
           );
           fmt = craneLib.cargoFmt { inherit src; };
@@ -76,6 +94,13 @@
             // {
               inherit cargoArtifacts;
               cargoClippyExtraArgs = "--all-targets -- -D warnings";
+            }
+          );
+          clippy-dotos-text = craneLib.cargoClippy (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoClippyExtraArgs = "--features dotos-text --all-targets -- -D warnings";
             }
           );
         };

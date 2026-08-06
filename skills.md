@@ -1,20 +1,19 @@
-# skills — meta-signal-router
+# Working in meta-signal-router
 
-Before editing, read:
+Read `ARCHITECTURE.md`, the ordinary Router Interface, and the shared standard
+Interface before changing this contract.
 
-- `~/primary/skills/contract-repo.md`
-- `~/primary/skills/component-triad.md`
-- `~/primary/skills/naming.md`
-- `~/primary/skills/architecture-editor.md`
-- `~/primary/skills/architectural-truth-tests.md`
-- `~/primary/skills/nix-discipline.md`
-- this repo's `ARCHITECTURE.md`
-- `../signal-router/ARCHITECTURE.md`
-- `../router/ARCHITECTURE.md`
-- `../signal-mind/ARCHITECTURE.md`
-
-This repo owns only the meta-signal PersonaRouter channel-policy
-signal vocabulary. It contains no daemon, no database tables, no
-actor runtime, no CLI parser, and no policy evaluation logic.
-The caller is PersonaOrchestrate; do not document or implement Mind as
-calling this contract directly.
+- Treat `ethos/interface.ethos` as the sole schema authority.
+- Preserve the exact producer identities; add an import instead of copying a
+  producer declaration.
+- Keep the Interface role-free and keep generated Rust encoded-only.
+- Mint explicit declaration and variant seats; never derive identity from a
+  spelling, source position, or hash.
+- Put structural, Dotos, rkyv, route, and Signal behavior in
+  `src/schema/lib/behavior.rs`, never in the generated projection.
+- Do not add runtime actors, policy stores, sockets, or daemon behavior here.
+- Regenerate only with
+  `META_SIGNAL_ROUTER_UPDATE_INTERFACE_ARTIFACTS=1 cargo build --all-features`,
+  then prove an ordinary build is fresh.
+- Run default and all-feature tests, formatting, clippy with warnings denied,
+  rustdoc with warnings denied, and `nix flake check --all-systems`.

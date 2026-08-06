@@ -1,0 +1,15 @@
+;; Every owner Router request root, in encoded canonical order.
+Extend.(channel-aab TimeBound.7)
+Deny.(fixture fixture)
+SetMirrorEnabled.True
+Revoke.(channel-aab fixture)
+Grant.(External.Network.(host-aab 7) External.Network.(host-aab 7) [] TimeBound.7)
+
+;; Every owner Router reply root, in encoded canonical order.
+ChannelOrderRejected.(Deny MetaAuthorityRequired)
+ChannelGranted.channel-aab
+AdjudicationDenied.fixture
+MirrorEnabledSet.True
+ChannelRevoked.channel-aab
+ChannelExtended.channel-aab
+RequestUnimplemented.(Deny PolicyStoreUnavailable)
