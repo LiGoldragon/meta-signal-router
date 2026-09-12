@@ -6,13 +6,12 @@
 ; observations live in `signal-router`.
 ;
 ; Router identities — the engine, the channel, the owning Unix user, and the
-; nanosecond clock — are imported from the ordinary producer. `ComponentKind`
-; and `NetworkEndpoint` are declared here: the shared taxonomy lives in the
-; `signal` crate, whose `links = "signal"` key would seat a resolution-time
-; singleton in the router graph, and every contract in that graph is
-; self-contained.
+; nanosecond clock — are imported from the ordinary producer. The component and
+; network vocabulary is imported from the shared `signal` taxonomy, which owns
+; it for the whole estate.
 Signal
-[ signal_router:[ TimestampNanos EngineIdentifier ChannelIdentifier UnixUserIdentifier HostName ] ]
+[ signal_router:[ TimestampNanos EngineIdentifier ChannelIdentifier UnixUserIdentifier ]
+  signal:[ ComponentKind HostName NetworkEndpoint ] ]
 [ Extend.ChannelExtension
   Deny.AdjudicationDenial
   SetMirrorEnabled.MirrorEnabled
@@ -28,10 +27,6 @@ Signal
 [ AdjudicationRequestIdentifier.String
   SystemPrincipal.String
   TextBody.String
-  NetworkPort.Integer
-  NetworkEndpoint.{ HostName NetworkPort }
-  ComponentKind.[ Message Router Criome Mind Spirit Persona Agent Mirror Introspect
-                  Harness Terminal System Lojix Orchestrate ]
 
   OperationKind.[ Deny Grant Extend Revoke ]
   MirrorEnabled.Boolean

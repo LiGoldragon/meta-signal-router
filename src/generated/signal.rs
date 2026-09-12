@@ -6,40 +6,6 @@ pub type SystemPrincipal = String;
 #[rustfmt::skip]
 pub type TextBody = String;
 #[rustfmt::skip]
-pub type NetworkPort = i64;
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub struct NetworkEndpoint {
-    pub host_name: signal_router::HostName,
-    pub network_port: NetworkPort,
-}
-#[rustfmt::skip]
-#[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
-#[cfg_attr(
-    feature = "datom",
-    derive(datom_codec::Datomizable, datom_codec::Compositional)
-)]
-pub enum ComponentKind {
-    Message,
-    Router,
-    Criome,
-    Mind,
-    Spirit,
-    Persona,
-    Agent,
-    Mirror,
-    Introspect,
-    Harness,
-    Terminal,
-    System,
-    Lojix,
-    Orchestrate,
-}
-#[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(
     feature = "datom",
@@ -61,7 +27,7 @@ pub type MirrorEnabled = bool;
 )]
 pub struct OtherPersonaEngine {
     pub engine_identifier: signal_router::EngineIdentifier,
-    pub host_name: signal_router::HostName,
+    pub host_name: signal::HostName,
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]
@@ -70,7 +36,7 @@ pub struct OtherPersonaEngine {
     derive(datom_codec::Datomizable, datom_codec::Compositional)
 )]
 pub enum ConnectionClass {
-    Network(NetworkEndpoint),
+    Network(signal::NetworkEndpoint),
     System(SystemPrincipal),
     NonOwnerUser(signal_router::UnixUserIdentifier),
     OtherPersona(OtherPersonaEngine),
@@ -84,7 +50,7 @@ pub enum ConnectionClass {
 )]
 pub enum ChannelEndpoint {
     External(ConnectionClass),
-    Internal(ComponentKind),
+    Internal(signal::ComponentKind),
 }
 #[rustfmt::skip]
 #[derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize, Clone, Debug, PartialEq)]

@@ -42,18 +42,15 @@ It imports identities whose meaning is already owned elsewhere:
 
 | Producer | Imported declarations |
 | --- | --- |
-| `signal-router` | `ChannelIdentifier`, `EngineIdentifier`, `TimestampNanos`, `UnixUserIdentifier`, `HostName` |
+| `signal-router` | `ChannelIdentifier`, `EngineIdentifier`, `TimestampNanos`, `UnixUserIdentifier` |
+| `signal` | `ComponentKind`, `HostName`, `NetworkEndpoint` |
 
-The imports are Ethos imports: the generated Rust writes `signal_router::HostName`
-and the rest fully qualified, so there is one definition and no copy.
-
-`ComponentKind` and `NetworkEndpoint` are declared here rather than imported.
-The estate-wide taxonomy lives in the `signal` crate, whose `links = "signal"`
-key would seat a resolution-time singleton in Router's dependency graph, and
-every contract in that graph — `signal-persona`, `signal-harness`,
-`signal-message`, `signal-mind`, `signal-router` — is self-contained. The
-variant list is `signal` 3.0.2's, verbatim; it must be kept in step by hand,
-and that is the known cost of the self-contained posture.
+The imports are Ethos imports: the generated Rust writes `signal::ComponentKind`
+and the rest fully qualified, so there is one definition and no copy. `signal`
+carries `links = "signal"`, which forbids two different sources or revisions of
+it in one graph — that key is what enforces a single shared frame type and a
+single shared taxonomy across the estate. Every contract in this wave pins the
+same source and the same revision.
 
 `ComponentKind` gives internal endpoints the estate-wide component vocabulary.
 `NetworkEndpoint` gives network connection classes a structured host and port;
@@ -70,9 +67,11 @@ authority transaction, no encoded identity table, and no build-time codegen
 beyond that assertion: the generated Rust is readable, and its names are the
 schema's own.
 
-`src/lib.rs` re-exports that projection, re-exports the five imported ordinary
-Router identities, and adds the frame surface: `Signal<T>`, `Signalizable`,
-`ByteViewable`, `Restorable`.
+`src/lib.rs` re-exports that projection, re-exports the imported identities,
+and re-exports the portable frame — `Signal<T>`, `Signalizable`, `ByteViewable`,
+`Restorable` — from `signal`, so an owner router frame is the same Rust type as
+every other contract's frame. A vendored copy of those four would be a fork of
+the wire type.
 
 ## The wire
 
@@ -80,7 +79,8 @@ One order is one Signal frame carrying the rkyv archive of `Query`; one answer
 is one frame of `Response`. The contract carries no envelope, no exchange
 identifier, no lane, no epoch and no route code: the `Query` and `Response`
 heads are the discrimination, and the connection is the correlation. The byte
-layer — a four-byte big-endian length prefix — belongs to the transport.
+layer — a four-byte big-endian length prefix — belongs to `signal`'s framing and
+to the transport, not to this contract.
 
 ## Boundary
 
