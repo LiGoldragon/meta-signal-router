@@ -1,0 +1,20 @@
+; Canonical Datom examples for meta-signal-router.
+; Every line is one contract head: a Query or a Response.
+
+Extend.{ channel-aab Permanent }
+Deny.{ adjudication-7 «the owner declined this channel» }
+SetMirrorEnabled.True
+Revoke.{ channel-aab «the grant expired» }
+Grant.{ External.Network.{ hexis 7421 } Internal.Harness [ MessageDelivery TranscriptEvent ] TimeBound.1757600000000000000 }
+Grant.{ External.System.systemd Internal.Router [] OneShot }
+Grant.{ External.NonOwnerUser.1001 Internal.Router [] OneShot }
+Grant.{ External.OtherPersona.{ engine-2 goldragon } Internal.Router [] OneShot }
+Grant.{ External.Owner Internal.Router [] OneShot }
+
+ChannelOrderRejected.{ Deny MetaAuthorityRequired }
+ChannelGranted.channel-aab
+AdjudicationDenied.adjudication-7
+MirrorEnabledSet.False
+ChannelRevoked.channel-aab
+ChannelExtended.channel-aab
+RequestUnimplemented.{ Grant PolicyStoreUnavailable }

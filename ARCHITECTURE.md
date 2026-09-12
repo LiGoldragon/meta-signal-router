@@ -42,13 +42,18 @@ It imports identities whose meaning is already owned elsewhere:
 
 | Producer | Imported declarations |
 | --- | --- |
-| `signal-router` | `ChannelIdentifier`, `EngineIdentifier`, `TimestampNanos`, `UnixUserIdentifier` |
-| `signal-standard` | `ComponentKind`, `HostName`, `NetworkEndpoint` |
+| `signal-router` | `ChannelIdentifier`, `EngineIdentifier`, `TimestampNanos`, `UnixUserIdentifier`, `HostName` |
 
-The imports are producer identities, not copied declarations or readable Rust
-aliases. `build.rs` resolves each producer's Cargo-published Ethos directory,
-proves it is the exact source compiled by the pinned dependency, imports its
-authority seats, and projects an explicit encoded Rust path for each type.
+The imports are Ethos imports: the generated Rust writes `signal_router::HostName`
+and the rest fully qualified, so there is one definition and no copy.
+
+`ComponentKind` and `NetworkEndpoint` are declared here rather than imported.
+The estate-wide taxonomy lives in the `signal` crate, whose `links = "signal"`
+key would seat a resolution-time singleton in Router's dependency graph, and
+every contract in that graph — `signal-persona`, `signal-harness`,
+`signal-message`, `signal-mind`, `signal-router` — is self-contained. The
+variant list is `signal` 3.0.2's, verbatim; it must be kept in step by hand,
+and that is the known cost of the self-contained posture.
 
 `ComponentKind` gives internal endpoints the estate-wide component vocabulary.
 `NetworkEndpoint` gives network connection classes a structured host and port;
@@ -57,63 +62,37 @@ combine the ordinary Router engine identity with the shared host identity.
 
 ## Authority and projection
 
-`ethos/interface.ethos` is a role-free `Interface.{1 0 0}` and the only schema
-source. The three role lists are empty. `MetaRouterRequest` and
-`MetaRouterReply` are ordinary declarations because request/reply seating is
-behavior at this bootstrap stage, not textual authority smuggled into a role
-slot.
+`ethos/signal.ethos` is a `Signal` root and the only schema authority. `build.rs`
+actualizes it through `ethos-zero` and asserts the checked-in Rust projection in
+`src/generated/signal.rs` equals a fresh generation, so the committed code is
+the authored schema and nothing else. There is no bootstrap manifest, no
+authority transaction, no encoded identity table, and no build-time codegen
+beyond that assertion: the generated Rust is readable, and its names are the
+schema's own.
 
-`src/bootstrap_manifest.rs` contains the explicit, already-minted authority,
-grammar, declaration, variant, and canonical-order seats. `build.rs` constructs
-the prior catalog, adds the exact producer seats, authorizes precisely the
-manifested transition, revalidates it through Core Ethos/Nomos, and asks Rust
-Logos for the checked encoded projection at
-`src/schema/lib/generated.rs`.
+`src/lib.rs` re-exports that projection, re-exports the five imported ordinary
+Router identities, and adds the frame surface: `Signal<T>`, `Signalizable`,
+`ByteViewable`, `Restorable`.
 
-The generated file contains only encoded coordinates. Visible spellings remain
-in Ethos, Dotos, diagnostics, and explicit route behavior; no readable schema
-type is copied into Rust.
+## The wire
 
-`src/schema/lib/behavior.rs` owns the behavior not yet expressed by the
-bootstrap language:
+One order is one Signal frame carrying the rkyv archive of `Query`; one answer
+is one frame of `Response`. The contract carries no envelope, no exchange
+identifier, no lane, no epoch and no route code: the `Query` and `Response`
+heads are the discrimination, and the connection is the correlation. The byte
+layer — a four-byte big-endian length prefix — belongs to the transport.
 
-- structural conversion for local and imported values;
-- Dotos encoding and decoding at the text edge;
-- rkyv behavior for encoded declarations;
-- request/reply route seating;
-- Signal framing at contract binding 8, wire revision 2.
+## Boundary
 
-The structural adapters translate the common recursive wire shape at producer
-boundaries. They do not rename, wrap, or redefine imported identities.
+This crate is a contract. It holds no daemon actor, store table, socket
+listener, CLI parser, or command lowering. Ordinary Router observation,
+session, forwarding, bootstrap, and actor-registration relations belong to
+`signal-router`; policy evaluation and persistence belong to `router`.
 
-## Boundaries
+## Witnesses
 
-This repository contains no Router actor, policy evaluator, durable grant
-table, socket listener, bootstrap file reader, CLI parser, or command lowering.
-Those belong to the `router` runtime. Ordinary observation, forwarding,
-session, bootstrap, and actor-registration relations belong to
-`signal-router`.
-
-The contract assumes no permanent compiler, host language, transport process,
-or operating system. Its durable meaning is the relation expressed in Ethos;
-Rust, rkyv, and the current Signal envelope are projections and behavior at the
-present machine boundary.
-
-## Verification
-
-The witness suite proves:
-
-- every one of the five requests traverses the bound Signal frame;
-- every one of the seven replies traverses Signal and rkyv;
-- every root round-trips through Dotos with its visible head;
-- canonical Dotos examples are exact;
-- imported Router and standard types cross the structural boundary;
-- the producer pins and corrected generator revision are exact;
-- bootstrap dependencies do not enter the default runtime graph;
-- the legacy schema source, emitter vocabulary, Nota edge, and copied
-  declarations are absent.
-
-After changing the Interface, update the explicit manifest first and regenerate
-with `META_SIGNAL_ROUTER_UPDATE_INTERFACE_ARTIFACTS=1 cargo build
---all-features`. An ordinary build must then prove the checked projection is
-fresh without the update variable.
+`tests/contract.rs` restores every order and answer from fresh peer bytes,
+round-trips every one through Datom text, actualizes every line of
+`examples/canonical.datom`, and refuses peer text beyond a one-mebibyte extent.
+`examples/canonical.datom` is written by the codec that reads it back, never
+by hand.

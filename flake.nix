@@ -1,5 +1,5 @@
 {
-  description = "meta-signal-router - owner Router channel-authority Interface";
+  description = "meta-signal-router - meta Router Signal contract for channel-authority orders";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -13,11 +13,11 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       flake-utils,
       fenix,
       crane,
+      ...
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -31,6 +31,8 @@
           "rust-src"
         ];
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
+        # `build.rs` reads the authored Ethos source; `tests/contract.rs`
+        # includes the canonical Datom witnesses.
         src = pkgs.lib.cleanSourceWith {
           src = ./.;
           filter =
@@ -59,25 +61,11 @@
         checks = {
           build = craneLib.cargoBuild (commonArgs // { inherit cargoArtifacts; });
           test = craneLib.cargoTest (commonArgs // { inherit cargoArtifacts; });
-          test-round-trip = craneLib.cargoTest (
+          test-datom = craneLib.cargoTest (
             commonArgs
             // {
               inherit cargoArtifacts;
-              cargoTestExtraArgs = "--test round_trip";
-            }
-          );
-          test-interface-contract = craneLib.cargoTest (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-              cargoTestExtraArgs = "--test interface_contract";
-            }
-          );
-          test-dotos-text = craneLib.cargoTest (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-              cargoTestExtraArgs = "--features dotos-text --all-targets";
+              cargoTestExtraArgs = "--all-features --all-targets";
             }
           );
           doc = craneLib.cargoDoc (
@@ -85,7 +73,7 @@
             // {
               inherit cargoArtifacts;
               RUSTDOCFLAGS = "-D warnings";
-              cargoDocExtraArgs = "--all-features";
+              cargoDocExtraArgs = "--no-deps --all-features";
             }
           );
           fmt = craneLib.cargoFmt { inherit src; };
@@ -93,14 +81,7 @@
             commonArgs
             // {
               inherit cargoArtifacts;
-              cargoClippyExtraArgs = "--all-targets -- -D warnings";
-            }
-          );
-          clippy-dotos-text = craneLib.cargoClippy (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-              cargoClippyExtraArgs = "--features dotos-text --all-targets -- -D warnings";
+              cargoClippyExtraArgs = "--all-targets --all-features -- -D warnings";
             }
           );
         };

@@ -5,5 +5,6 @@ Read `ARCHITECTURE.md` and `skills.md` before editing.
 ## Protos estate status
 
 Stack: correct-new destination
-Status: active component contract, current checkout legacy-wired
-This checkout is not proof of correct-new adoption.
+Status: migrated — `ethos/signal.ethos` is the authority, `protos` 0.30.1 /
+`datom-codec` 0.26.3 / `ethos-zero` 8.0.1 are the pinned producers, and the
+checked-in projection is asserted fresh at build time.

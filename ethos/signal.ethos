@@ -1,0 +1,70 @@
+; The meta Router Signal contract: channel-authority orders only.
+;
+; Grants, extensions, revocations, adjudication denials, and the mirror
+; switch. Orchestrate calls this surface; Mind decides at the cognitive level
+; and orders Orchestrate first, never this contract directly. Ordinary router
+; observations live in `signal-router`.
+;
+; Router identities — the engine, the channel, the owning Unix user, and the
+; nanosecond clock — are imported from the ordinary producer. `ComponentKind`
+; and `NetworkEndpoint` are declared here: the shared taxonomy lives in the
+; `signal` crate, whose `links = "signal"` key would seat a resolution-time
+; singleton in the router graph, and every contract in that graph is
+; self-contained.
+Signal
+[ signal_router:[ TimestampNanos EngineIdentifier ChannelIdentifier UnixUserIdentifier HostName ] ]
+[ Extend.ChannelExtension
+  Deny.AdjudicationDenial
+  SetMirrorEnabled.MirrorEnabled
+  Revoke.ChannelRevocation
+  Grant.ChannelGrant ]
+[ ChannelOrderRejected.RejectedChannelOrder
+  ChannelGranted.GrantedChannel
+  AdjudicationDenied.DeniedAdjudication
+  MirrorEnabledSet.MirrorEnabled
+  ChannelRevoked.RevokedChannel
+  ChannelExtended.ExtendedChannel
+  RequestUnimplemented.UnimplementedRequest ]
+[ AdjudicationRequestIdentifier.String
+  SystemPrincipal.String
+  TextBody.String
+  NetworkPort.Integer
+  NetworkEndpoint.{ HostName NetworkPort }
+  ComponentKind.[ Message Router Criome Mind Spirit Persona Agent Mirror Introspect
+                  Harness Terminal System Lojix Orchestrate ]
+
+  OperationKind.[ Deny Grant Extend Revoke ]
+  MirrorEnabled.Boolean
+
+  OtherPersonaEngine.{ EngineIdentifier HostName }
+  ConnectionClass.[ Network.NetworkEndpoint
+                    System.SystemPrincipal
+                    NonOwnerUser.UnixUserIdentifier
+                    OtherPersona.OtherPersonaEngine
+                    Owner ]
+  ChannelEndpoint.[ External.ConnectionClass Internal.ComponentKind ]
+  ChannelMessageKind.[ DeliveryNotification MessageDelivery AdjudicationRequest
+                       PromptBufferObservation MessageSubmission TerminalResize
+                       TerminalInput MessageIngressSubmission FocusObservation
+                       TerminalCapture InboxQuery TranscriptEvent ]
+  ChannelMessageKinds.Vector<ChannelMessageKind>
+  ChannelDuration.[ TimeBound.TimestampNanos OneShot Permanent ]
+
+  GrantSource.ChannelEndpoint
+  GrantTarget.ChannelEndpoint
+  ChannelGrant.{ GrantSource GrantTarget ChannelMessageKinds ChannelDuration }
+  ChannelExtension.{ ChannelIdentifier ChannelDuration }
+  ChannelRevocation.{ ChannelIdentifier TextBody }
+  AdjudicationDenial.{ AdjudicationRequestIdentifier TextBody }
+
+  GrantedChannel.ChannelIdentifier
+  ExtendedChannel.ChannelIdentifier
+  RevokedChannel.ChannelIdentifier
+  DeniedAdjudication.AdjudicationRequestIdentifier
+
+  ChannelOrderRejectionReason.[ MetaAuthorityRequired ChannelMissing
+                                AdjudicationRequestMissing PolicyRefused
+                                ChannelAlreadyExists ]
+  RejectedChannelOrder.{ OperationKind ChannelOrderRejectionReason }
+  UnimplementedReason.[ PolicyStoreUnavailable NotBuiltYet DependencyNotReady ]
+  UnimplementedRequest.{ OperationKind UnimplementedReason } ]
