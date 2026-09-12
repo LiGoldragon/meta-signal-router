@@ -135,7 +135,7 @@ dependencies = [
 
 [[package]]
 name = "meta-signal-router"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "datom-codec",
  "ethos-zero",
@@ -298,8 +298,8 @@ dependencies = [
 
 [[package]]
 name = "signal-router"
-version = "3.0.0"
-source = "git+https://github.com/LiGoldragon/signal-router.git?rev=602c61199693bbfb863017963a7065b163e80ed4#602c61199693bbfb863017963a7065b163e80ed4"
+version = "4.0.0"
+source = "git+https://github.com/LiGoldragon/signal-router?rev=79753fba3cf937628c067420a4d7eb1d05981a42#79753fba3cf937628c067420a4d7eb1d05981a42"
 dependencies = [
  "datom-codec",
  "ethos-zero",

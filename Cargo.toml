@@ -1,6 +1,6 @@
 [package]
 name = "meta-signal-router"
-version = "3.0.0"
+version = "3.0.1"
 edition = "2024"
 rust-version = "1.89"
 license = "MIT OR Apache-2.0"
@@ -23,7 +23,7 @@ datom-codec = { git = "https://github.com/LiGoldragon/datom-codec", rev = "627db
 protos = { git = "https://github.com/LiGoldragon/protos", rev = "171b21f65337983ab624b7b906397a4f1f92c5a3", optional = true }
 rkyv = { version = "0.8", default-features = false, features = ["std", "bytecheck", "little_endian", "pointer_width_32", "unaligned"] }
 signal = { git = "https://github.com/LiGoldragon/signal", rev = "8f9a0deb701cebbea518679548df4a795affc918", default-features = false }
-signal-router = { git = "https://github.com/LiGoldragon/signal-router.git", rev = "602c61199693bbfb863017963a7065b163e80ed4", default-features = false }
+signal-router = { git = "https://github.com/LiGoldragon/signal-router", rev = "79753fba3cf937628c067420a4d7eb1d05981a42", default-features = false }
 
 [build-dependencies]
 ethos-zero = { git = "https://github.com/LiGoldragon/ethos-zero", rev = "de3d9928b156f2e1a92d060b7817af201abfdbef" }
