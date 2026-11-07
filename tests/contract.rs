@@ -8,33 +8,43 @@ use meta_signal_router::{
 
 fn grant() -> ChannelGrant {
     ChannelGrant {
-        grant_source: ChannelEndpoint::External(ConnectionClass::Network(NetworkEndpoint {
-            host_name: String::from("hexis"),
-            network_port: 7421,
-        })),
-        grant_target: ChannelEndpoint::Internal(ComponentKind::Harness),
-        channel_message_kinds: vec![
+        grant_source: meta_signal_router::GrantSource(ChannelEndpoint::External(
+            ConnectionClass::Network(NetworkEndpoint {
+                host_name: signal::HostName(String::from("hexis")),
+                network_port: signal::NetworkPort(7421),
+            }),
+        )),
+        grant_target: meta_signal_router::GrantTarget(ChannelEndpoint::Internal(
+            ComponentKind::Harness,
+        )),
+        channel_message_kinds: meta_signal_router::ChannelMessageKinds(vec![
             ChannelMessageKind::MessageDelivery,
             ChannelMessageKind::TranscriptEvent,
-        ],
-        channel_duration: ChannelDuration::TimeBound(1_757_600_000_000_000_000),
+        ]),
+        channel_duration: ChannelDuration::TimeBound(signal_router::TimestampNanos(
+            1_757_600_000_000_000_000,
+        )),
     }
 }
 
 fn queries() -> Vec<Query> {
     vec![
         Query::Extend(ChannelExtension {
-            channel_identifier: String::from("channel-aab"),
+            channel_identifier: signal_router::ChannelIdentifier(String::from("channel-aab")),
             channel_duration: ChannelDuration::Permanent,
         }),
         Query::Deny(AdjudicationDenial {
-            adjudication_request_identifier: String::from("adjudication-7"),
-            text_body: String::from("the owner declined this channel"),
+            adjudication_request_identifier: meta_signal_router::AdjudicationRequestIdentifier(
+                String::from("adjudication-7"),
+            ),
+            text_body: meta_signal_router::TextBody(String::from(
+                "the owner declined this channel",
+            )),
         }),
-        Query::SetMirrorEnabled(true),
+        Query::SetMirrorEnabled(meta_signal_router::MirrorEnabled(true)),
         Query::Revoke(ChannelRevocation {
-            channel_identifier: String::from("channel-aab"),
-            text_body: String::from("the grant expired"),
+            channel_identifier: signal_router::ChannelIdentifier(String::from("channel-aab")),
+            text_body: meta_signal_router::TextBody(String::from("the grant expired")),
         }),
         Query::Grant(grant()),
     ]
@@ -46,11 +56,19 @@ fn responses() -> Vec<Response> {
             operation_kind: OperationKind::Deny,
             channel_order_rejection_reason: ChannelOrderRejectionReason::MetaAuthorityRequired,
         }),
-        Response::ChannelGranted(String::from("channel-aab")),
-        Response::AdjudicationDenied(String::from("adjudication-7")),
-        Response::MirrorEnabledSet(false),
-        Response::ChannelRevoked(String::from("channel-aab")),
-        Response::ChannelExtended(String::from("channel-aab")),
+        Response::ChannelGranted(meta_signal_router::GrantedChannel(
+            signal_router::ChannelIdentifier(String::from("channel-aab")),
+        )),
+        Response::AdjudicationDenied(meta_signal_router::DeniedAdjudication(
+            meta_signal_router::AdjudicationRequestIdentifier(String::from("adjudication-7")),
+        )),
+        Response::MirrorEnabledSet(meta_signal_router::MirrorEnabled(false)),
+        Response::ChannelRevoked(meta_signal_router::RevokedChannel(
+            signal_router::ChannelIdentifier(String::from("channel-aab")),
+        )),
+        Response::ChannelExtended(meta_signal_router::ExtendedChannel(
+            signal_router::ChannelIdentifier(String::from("channel-aab")),
+        )),
         Response::RequestUnimplemented(UnimplementedRequest {
             operation_kind: OperationKind::Grant,
             unimplemented_reason: UnimplementedReason::PolicyStoreUnavailable,
@@ -62,20 +80,24 @@ fn responses() -> Vec<Response> {
 /// vocabulary rides only in the canonical file.
 fn endpoint_classes() -> Vec<Query> {
     [
-        ConnectionClass::System(String::from("systemd")),
-        ConnectionClass::NonOwnerUser(1001),
+        ConnectionClass::System(meta_signal_router::SystemPrincipal(String::from("systemd"))),
+        ConnectionClass::NonOwnerUser(signal_router::UnixUserIdentifier(1001)),
         ConnectionClass::OtherPersona(OtherPersonaEngine {
-            engine_identifier: String::from("engine-2"),
-            host_name: String::from("goldragon"),
+            engine_identifier: signal_router::EngineIdentifier(String::from("engine-2")),
+            host_name: signal::HostName(String::from("goldragon")),
         }),
         ConnectionClass::Owner,
     ]
     .into_iter()
     .map(|connection_class| {
         Query::Grant(ChannelGrant {
-            grant_source: ChannelEndpoint::External(connection_class),
-            grant_target: ChannelEndpoint::Internal(ComponentKind::Router),
-            channel_message_kinds: Vec::new(),
+            grant_source: meta_signal_router::GrantSource(ChannelEndpoint::External(
+                connection_class,
+            )),
+            grant_target: meta_signal_router::GrantTarget(ChannelEndpoint::Internal(
+                ComponentKind::Router,
+            )),
+            channel_message_kinds: meta_signal_router::ChannelMessageKinds(Vec::new()),
             channel_duration: ChannelDuration::OneShot,
         })
     })
@@ -118,9 +140,15 @@ fn malformed_peer_bytes_are_rejected() {
 #[test]
 fn bare_heads_cross_the_wire_as_bare_heads() {
     let query = Query::Grant(ChannelGrant {
-        grant_source: ChannelEndpoint::External(ConnectionClass::Owner),
-        grant_target: ChannelEndpoint::Internal(ComponentKind::Mirror),
-        channel_message_kinds: vec![ChannelMessageKind::InboxQuery],
+        grant_source: meta_signal_router::GrantSource(ChannelEndpoint::External(
+            ConnectionClass::Owner,
+        )),
+        grant_target: meta_signal_router::GrantTarget(ChannelEndpoint::Internal(
+            ComponentKind::Mirror,
+        )),
+        channel_message_kinds: meta_signal_router::ChannelMessageKinds(vec![
+            ChannelMessageKind::InboxQuery,
+        ]),
         channel_duration: ChannelDuration::OneShot,
     });
     let received =
@@ -143,15 +171,13 @@ mod datom {
     fn budget() -> Budget {
         Budget {
             remaining: i64::try_from(PEER_TEXT_EXTENT).expect("the extent fits an i64"),
-            reader: ReaderBudget {
-                remaining: PEER_TEXT_EXTENT,
-            },
+            reader: ReaderBudget::try_from(PEER_TEXT_EXTENT).expect("bounded reader budget"),
             depth: 0,
             maximum_depth: PEER_TEXT_DEPTH,
         }
     }
 
-    fn textualize<T: Datomizable<Output = datom_codec::Datom>>(value: T) -> String {
+    fn textualize<T: Datomizable>(value: T) -> String {
         value.datomize(vec![]).protosize().textualize()
     }
 
@@ -205,7 +231,7 @@ mod datom {
     fn peer_text_beyond_the_extent_is_refused() {
         let mut exhausted = Budget {
             remaining: 4,
-            reader: ReaderBudget { remaining: 4 },
+            reader: ReaderBudget::try_from(4).expect("bounded reader budget"),
             depth: 0,
             maximum_depth: PEER_TEXT_DEPTH,
         };
